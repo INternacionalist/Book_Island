@@ -1,7 +1,7 @@
 <Window x:Class="WpfAppBookStore.ProfileWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Профиль" Height="360" Width="460"
+        Title="Профиль" Height="500" Width="460"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#F2F6FF">
@@ -9,12 +9,33 @@
         <Border Background="White" CornerRadius="20" Padding="28">
             <StackPanel>
                 <TextBlock Text="Профиль" FontSize="30" FontWeight="Bold" Foreground="#1A2550"/>
-                <TextBlock Text="Минималистично, современно и чисто." Foreground="#64729A" Margin="0,8,0,22"/>
+                <TextBlock Text="Данные аккаунта" Foreground="#64729A" Margin="0,8,0,22"/>
+
+                <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Имя" FontSize="13" Foreground="#64729A"/>
+                        <TextBlock x:Name="UserNameText" FontSize="24" FontWeight="SemiBold" Foreground="#1A2550"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Фамилия" FontSize="13" Foreground="#64729A"/>
+                        <TextBlock x:Name="LastNameText" FontSize="20" FontWeight="SemiBold" Foreground="#1A2550"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Номер телефона" FontSize="13" Foreground="#64729A"/>
+                        <TextBlock x:Name="PhoneText" FontSize="20" FontWeight="SemiBold" Foreground="#1A2550"/>
+                    </StackPanel>
+                </Border>
 
                 <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,18">
                     <StackPanel>
-                        <TextBlock Text="Имя пользователя" FontSize="13" Foreground="#64729A"/>
-                        <TextBlock x:Name="UserNameText" FontSize="24" FontWeight="SemiBold" Foreground="#1A2550"/>
+                        <TextBlock Text="ID" FontSize="13" Foreground="#64729A"/>
+                        <TextBlock x:Name="UserIdText" FontSize="20" FontWeight="SemiBold" Foreground="#1A2550"/>
                     </StackPanel>
                 </Border>
 

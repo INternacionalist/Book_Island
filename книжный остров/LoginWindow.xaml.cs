@@ -14,6 +14,20 @@ namespace WpfAppBookStore
             InitializeComponent();
         }
 
+        private void OpenRegistrationBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoginPanel.Visibility = Visibility.Collapsed;
+            RegistrationPanel.Visibility = Visibility.Visible;
+            Title = "Регистрация";
+        }
+
+        private void BackToLoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RegistrationPanel.Visibility = Visibility.Collapsed;
+            LoginPanel.Visibility = Visibility.Visible;
+            Title = "Вход в систему";
+        }
+
         // === ЛОГИКА ВХОДА (LOGIN) ===
         private void LoginBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -32,8 +46,8 @@ namespace WpfAppBookStore
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    
-                    string query = "SELECT * FROM читатели WHERE Login=@login AND Password=@pass";
+
+                    string query = "SELECT TOP 1 [id], [Login], [Фамилия], [номер телефона] FROM [dbo].[читатели] WHERE [Login]=@login AND [Password]=@pass";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@login", login);
@@ -41,10 +55,20 @@ namespace WpfAppBookStore
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.HasRows)
+                            if (reader.Read())
                             {
+                                int idOrdinal = reader.GetOrdinal("id");
+                                int loginOrdinal = reader.GetOrdinal("Login");
+                                int lastNameOrdinal = reader.GetOrdinal("Фамилия");
+                                int phoneOrdinal = reader.GetOrdinal("номер телефона");
+
+                                string dbLogin = reader.IsDBNull(loginOrdinal) ? login : reader.GetString(loginOrdinal);
+                                string dbLastName = reader.IsDBNull(lastNameOrdinal) ? string.Empty : reader.GetString(lastNameOrdinal);
+                                string dbPhone = reader.IsDBNull(phoneOrdinal) ? string.Empty : reader.GetString(phoneOrdinal);
+                                int userId = reader.IsDBNull(idOrdinal) ? 0 : reader.GetInt32(idOrdinal);
+
                                 new SuccessDialog("Вы успешно вошли!").ShowDialog();
-                                UserSession.Login(login);
+                                UserSession.Login(dbLogin, dbLastName, dbPhone, userId);
                                 DialogResult = true;
                                 Close();
                             }
@@ -70,8 +94,16 @@ namespace WpfAppBookStore
         // === ЛОГИКА РЕГИСТРАЦИИ (REGISTER) ===
         private void RegBtn_Click(object sender, RoutedEventArgs e)
         {
-            string login = UserLogin.Text.Trim();
-            string pass = UserPass.Password.Trim();
+            string login = RegName.Text.Trim();
+            string lastName = RegLastName.Text.Trim();
+            string phoneNumber = RegPhone.Text.Trim();
+            string pass = RegPass.Password.Trim();
+
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phoneNumber) || string.IsNullOrWhiteSpace(pass))
+            {
+                new ErrorDialog("Заполните все поля регистрации!").ShowDialog();
+                return;
+            }
 
             if (login.Length < 3 || pass.Length < 3)
             {
@@ -85,8 +117,7 @@ namespace WpfAppBookStore
                 {
                     conn.Open();
 
-                    // Проверяем существование
-                    string checkQuery = "SELECT COUNT(*) FROM читатели WHERE Login=@login";
+                    string checkQuery = "SELECT COUNT(*) FROM [dbo].[читатели] WHERE [Login]=@login";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@login", login);
@@ -99,17 +130,23 @@ namespace WpfAppBookStore
                         }
                     }
 
-                    // Добавляем нового пользователя
-                    string insertQuery = "INSERT INTO читатели (Login, Password) VALUES (@login, @pass)";
+                    string insertQuery = @"INSERT INTO [dbo].[читатели] ([Login], [Password], [Фамилия], [номер телефона], [дата регистрации])
+                                           VALUES (@login, @pass, @lastName, @phone, GETDATE());
+                                           SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                    int newUserId;
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                     {
                         insertCmd.Parameters.AddWithValue("@login", login);
                         insertCmd.Parameters.AddWithValue("@pass", pass);
-                        insertCmd.ExecuteNonQuery();
+                        insertCmd.Parameters.AddWithValue("@lastName", lastName);
+                        insertCmd.Parameters.AddWithValue("@phone", phoneNumber);
+                        object? result = insertCmd.ExecuteScalar();
+                        newUserId = result is int id ? id : 0;
                     }
 
                     new SuccessDialog("Регистрация прошла успешно!").ShowDialog();
-                    UserSession.Login(login);
+                    UserSession.Login(login, lastName, phoneNumber, newUserId);
                     DialogResult = true;
                     Close();
                 }
