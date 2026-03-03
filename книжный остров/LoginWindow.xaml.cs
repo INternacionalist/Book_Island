@@ -44,7 +44,9 @@ namespace WpfAppBookStore
                             if (reader.HasRows)
                             {
                                 new SuccessDialog("Вы успешно вошли!").ShowDialog();
-                                this.Close();
+                                UserSession.Login(login);
+                                DialogResult = true;
+                                Close();
                             }
                             else
                             {
@@ -107,7 +109,9 @@ namespace WpfAppBookStore
                     }
 
                     new SuccessDialog("Регистрация прошла успешно!").ShowDialog();
-                    this.Close();
+                    UserSession.Login(login);
+                    DialogResult = true;
+                    Close();
                 }
             }
             catch (Exception ex)

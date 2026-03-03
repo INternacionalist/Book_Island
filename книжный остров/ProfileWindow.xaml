@@ -1,0 +1,33 @@
+<Window x:Class="WpfAppBookStore.ProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Профиль" Height="360" Width="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F2F6FF">
+    <Grid Margin="20">
+        <Border Background="White" CornerRadius="20" Padding="28">
+            <StackPanel>
+                <TextBlock Text="Профиль" FontSize="30" FontWeight="Bold" Foreground="#1A2550"/>
+                <TextBlock Text="Минималистично, современно и чисто." Foreground="#64729A" Margin="0,8,0,22"/>
+
+                <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,18">
+                    <StackPanel>
+                        <TextBlock Text="Имя пользователя" FontSize="13" Foreground="#64729A"/>
+                        <TextBlock x:Name="UserNameText" FontSize="24" FontWeight="SemiBold" Foreground="#1A2550"/>
+                    </StackPanel>
+                </Border>
+
+                <Button Content="Закрыть" Height="42" Width="120" HorizontalAlignment="Right" Background="#4B6BFB" Foreground="White" BorderThickness="0" Click="Close_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

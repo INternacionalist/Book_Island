@@ -1,47 +1,29 @@
-﻿<Window x:Class="WpfAppBookStore.MainWindow"
+<Window x:Class="WpfAppBookStore.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Магазин Книг" Height="700" Width="1200"
-        WindowStartupLocation="CenterScreen">
-
+        Title="Книжный остров" Height="820" Width="1320"
+        WindowStartupLocation="CenterScreen"
+        Background="#F2F6FF">
     <Window.Resources>
-        <!-- Стиль для карточки книги -->
-        <Style x:Key="BookCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Padding" Value="15"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect BlurRadius="15" ShadowDepth="3" Opacity="0.3"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#4B6BFB"/>
+        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#3553D8"/>
+        <SolidColorBrush x:Key="PrimarySoftBrush" Color="#E9EEFF"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextMainBrush" Color="#182033"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#65708A"/>
 
-        <!-- Стиль для кнопки "Купить" -->
-        <Style x:Key="BuyButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FF6B35"/>
+        <Style x:Key="HeaderActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="6" 
-                                Padding="{TemplateBinding Padding}">
+                        <Border CornerRadius="14" Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -49,199 +31,223 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E85D2A"/>
+                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
                 </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#D04D1A"/>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BookCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,0,16,16"/>
+            <Setter Property="Width" Value="220"/>
+            <Setter Property="Height" Value="400"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="14" ShadowDepth="4" Opacity="0.16" Color="#2A3D78"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="6" Opacity="0.24" Color="#2A3D78"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BuyButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid x:Name="MainGrid">
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#FFFFFF" Offset="0"/>
-                <GradientStop Color="#F5F5F5" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="96"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Шапка -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
-            <Grid Margin="20,10">
+        <Border Grid.Row="0" Margin="16" Background="White" CornerRadius="20" Padding="20,14">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.16" Color="#22346D"/>
+            </Border.Effect>
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Кнопка меню -->
-                <Button Grid.Column="0" Width="50" Height="50" Background="Transparent" 
-                        BorderThickness="2" BorderBrush="#333" Margin="0,0,20,0" Cursor="Hand">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Border Background="Transparent" BorderBrush="#333" BorderThickness="2" CornerRadius="8">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <Rectangle Width="25" Height="3" Fill="#333" Margin="0,3"/>
-                                    <Rectangle Width="25" Height="3" Fill="#333" Margin="0,3"/>
-                                    <Rectangle Width="25" Height="3" Fill="#333" Margin="0,3"/>
-                                </StackPanel>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Grid Grid.Column="0">
+                    <Border Background="{StaticResource PrimarySoftBrush}" CornerRadius="16" Height="54" VerticalAlignment="Center" BorderBrush="#D4DEFF" BorderThickness="1">
+                        <TextBox x:Name="SearchBox"
+                                 Margin="16,0"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 FontSize="16"
+                                 VerticalContentAlignment="Center"
+                                 Foreground="{StaticResource TextMainBrush}"
+                                 TextChanged="SearchBox_TextChanged"
+                                 ToolTip="Начните вводить название книги"/>
+                    </Border>
+                    <Popup x:Name="SearchSuggestionsPopup"
+                           PlacementTarget="{Binding ElementName=SearchBox}"
+                           Placement="Bottom"
+                           AllowsTransparency="True"
+                           StaysOpen="False"
+                           VerticalOffset="8">
+                        <Border Width="760" MaxHeight="260" Background="White" CornerRadius="14" BorderBrush="#D5DDF8" BorderThickness="1" Padding="10">
+                            <ListBox x:Name="SearchSuggestionsList"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     MouseDoubleClick="SearchSuggestionsList_MouseDoubleClick"
+                                     SelectionChanged="SearchSuggestionsList_SelectionChanged">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}"/>
+                                                <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" FontSize="12"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="В корзину" Style="{StaticResource BuyButtonStyle}" Tag="{Binding BookID}" Margin="12,0,0,0" Click="BuyButton_Click"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </Popup>
+                </Grid>
 
-                <!-- Поиск -->
-                <Border Grid.Column="1" Background="White" CornerRadius="25" 
-                        BorderBrush="#DDD" BorderThickness="2" Height="50">
-                    <TextBox x:Name="SearchBox" 
-                             Text="Поиск..." 
-                             VerticalAlignment="Center" 
-                             Padding="20,0" 
-                             FontSize="16" 
-                             BorderThickness="0"
-                             GotFocus="SearchBox_GotFocus"
-                             Foreground="#666"/>
-                </Border>
-
-                <!-- Кнопка темы -->
-                <Button x:Name="ThemeBtn" Grid.Column="2" Content="🌙 тема" 
-                        Width="100" Height="50" Margin="20,0"
-                        Background="Transparent" BorderBrush="#333" BorderThickness="2"
-                        FontSize="14" Cursor="Hand" Click="ThemeBtn_Click">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-
-                <!-- Кнопка логина -->
-                <Button Grid.Column="3" Content="👤 логин" 
-                        Width="100" Height="50"
-                        Background="Transparent" BorderBrush="#333" BorderThickness="2"
-                        FontSize="14" Cursor="Hand" Click="reg">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Button x:Name="ThemeBtn" Grid.Column="1" Content="🌙 Тема" Width="110" Margin="16,0" Style="{StaticResource HeaderActionButtonStyle}" Click="ThemeBtn_Click"/>
+                <Button x:Name="ProfileButton" Grid.Column="2" Width="132" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
             </Grid>
         </Border>
 
-        <!-- Контент -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="16,0,16,16">
             <StackPanel>
-                <!-- Заголовок секции -->
-                <Button Content="🔥 популярные ->" 
-                        HorizontalAlignment="Left" 
-                        Margin="10,20,0,20"
-                        Background="Transparent" 
-                        BorderBrush="#333" 
-                        BorderThickness="2" 
-                        Padding="15,8" 
-                        FontSize="16" 
-                        FontWeight="Bold"
-                        Cursor="Hand">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Border Margin="0,0,0,24" CornerRadius="20" Background="{StaticResource PrimaryBrush}" Padding="24">
+                    <StackPanel>
+                        <TextBlock Text="Книжный остров" Foreground="White" FontSize="34" FontWeight="Bold"/>
+                        <TextBlock Text="Подборки как в Читай-город: сначала популярные книги, ниже жанры и рекомендации." Foreground="#E8EDFF" Margin="0,6,0,0" FontSize="14"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Каталог книг -->
-                <ItemsControl x:Name="BooksItemsControl">
+                <TextBlock Text="🔥 Популярные книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
+                <TextBlock Text="Заглушка: сюда будет добавлен код анализа БД (50% чаще добавленные в корзину + 50% чаще купленные)." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
+
+                <ItemsControl x:Name="PopularBooksItemsControl" Margin="0,0,0,24">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
+                            <WrapPanel/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <!-- Карточка книги -->
-                            <Border Style="{StaticResource BookCardStyle}" Width="250" Height="420">
+                            <Border Style="{StaticResource BookCardStyle}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="280"/>
+                                        <RowDefinition Height="220"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-
-                                    <!-- Обложка книги -->
-                                    <Border Grid.Row="0" Background="#F0F0F0" CornerRadius="6" Margin="0,0,0,15">
-                                        <Image Source="{Binding CoverURL}" 
-                                               Stretch="Uniform" 
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
+                                    <Border Grid.Row="0" CornerRadius="12" Background="#EEF2FF">
+                                        <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                     </Border>
-
-                                    <!-- Информация о книге -->
-                                    <StackPanel Grid.Row="1">
-                                        <!-- Название -->
-                                        <TextBlock Text="{Binding Title}" 
-                                                   FontSize="16" 
-                                                   FontWeight="SemiBold" 
-                                                   TextWrapping="Wrap" 
-                                                   MaxHeight="45"
-                                                   Margin="0,0,0,5"
-                                                   Foreground="#333"/>
-
-                                        <!-- Автор -->
-                                        <TextBlock Text="{Binding Author}" 
-                                                   FontSize="13" 
-                                                   Foreground="#666"
-                                                   Margin="0,0,0,10"/>
-
-                                        <!-- Цена и кнопка -->
+                                    <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
+                                        <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-
-                                            <!-- Цена -->
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock FontSize="20" 
-                                                           FontWeight="Bold" 
-                                                           Foreground="#FF6B35">
-                                                    <Run Text="{Binding Price}"/>
-                                                    <Run Text=" ₽" FontSize="16"/>
-                                                </TextBlock>
-                                            </StackPanel>
-
-                                            <!-- Кнопка купить -->
-                                            <Button Grid.Column="1" 
-                                                    Content="Купить" 
-                                                    Style="{StaticResource BuyButtonStyle}"
-                                                    Click="BuyButton_Click"
-                                                    Tag="{Binding BookID}"/>
+                                            <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}">
+                                                <Run Text="{Binding Price}"/><Run Text=" ₽"/>
+                                            </TextBlock>
+                                            <Button Grid.Column="1" Content="Купить" Style="{StaticResource BuyButtonStyle}" Tag="{Binding BookID}" Click="BuyButton_Click"/>
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="📚 Жанры" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
+                <TextBlock Text="Заглушка: жанры и книги будут приходить из БД в следующих версиях." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
+
+                <ItemsControl x:Name="GenresItemsControl">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="White" CornerRadius="18" Padding="16" Margin="0,0,0,18" BorderBrush="#DDE4FF" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding GenreName}" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}" Margin="0,0,0,10"/>
+                                    <ItemsControl ItemsSource="{Binding Books}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource BookCardStyle}" Width="200" Height="360">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="180"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Grid.Row="0" Background="#EEF2FF" CornerRadius="12">
+                                                            <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="40"/>
+                                                            <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,6"/>
+                                                            <TextBlock Foreground="{StaticResource PrimaryDarkBrush}" FontWeight="Bold">
+                                                                <Run Text="{Binding Price}"/><Run Text=" ₽"/>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
