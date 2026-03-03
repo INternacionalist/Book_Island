@@ -10,10 +10,12 @@ namespace WpfAppBookStore
     {
         private int quantity = 1;
         private bool isSelected = true;
+        private bool isDescriptionExpanded;
 
         public int BookID { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public ImageSource? CoverImage { get; set; }
 
@@ -48,6 +50,21 @@ namespace WpfAppBookStore
                 }
 
                 isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsDescriptionExpanded
+        {
+            get => isDescriptionExpanded;
+            set
+            {
+                if (isDescriptionExpanded == value)
+                {
+                    return;
+                }
+
+                isDescriptionExpanded = value;
                 OnPropertyChanged();
             }
         }
@@ -89,6 +106,7 @@ namespace WpfAppBookStore
                 BookID = book.BookID,
                 Title = book.Title,
                 Author = book.Author,
+                Description = book.Description,
                 Price = book.Price,
                 CoverImage = book.CoverImage,
                 Quantity = 1,

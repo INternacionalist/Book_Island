@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace WpfAppBookStore
 {
@@ -92,6 +93,33 @@ namespace WpfAppBookStore
             UpdateTotal();
         }
 
+
+
+        private void DescriptionTextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not TextBlock { DataContext: CartItem clickedItem })
+            {
+                return;
+            }
+
+            bool shouldExpand = !clickedItem.IsDescriptionExpanded;
+            CollapseAllDescriptions();
+            clickedItem.IsDescriptionExpanded = shouldExpand;
+            e.Handled = true;
+        }
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            CollapseAllDescriptions();
+        }
+
+        private void CollapseAllDescriptions()
+        {
+            foreach (CartItem item in CartSession.Items)
+            {
+                item.IsDescriptionExpanded = false;
+            }
+        }
 
         private void RemoveItemButton_Click(object sender, RoutedEventArgs e)
         {

@@ -3,9 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Корзина" Height="620" Width="900"
         WindowStartupLocation="CenterOwner"
-        Background="#F2F4F8">
+        Background="#F2F4F8"
+        PreviewMouseDown="Window_PreviewMouseDown">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <Style x:Key="SelectionCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Width="26" Height="26">
+                            <Border x:Name="SelectionBorder" Background="#F4F6FF" BorderBrush="#D0D8F5" BorderThickness="1.5" CornerRadius="13"/>
+                            <TextBlock x:Name="SelectionIcon" Text="✦" FontSize="14" FontWeight="Bold" Foreground="#A3AED0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SelectionBorder" Property="Background" Value="#4B6BFB"/>
+                                <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="#3553D8"/>
+                                <Setter TargetName="SelectionIcon" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="#5A79FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <Style x:Key="DeleteButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="36"/>
@@ -77,7 +104,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Top" Margin="0,4,12,0" Checked="ItemSelectionCheckBox_Changed" Unchecked="ItemSelectionCheckBox_Changed"/>
+                                        <CheckBox Grid.Column="0" Style="{StaticResource SelectionCheckBoxStyle}" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Top" Margin="0,4,12,0" Checked="ItemSelectionCheckBox_Changed" Unchecked="ItemSelectionCheckBox_Changed"/>
 
                                         <Border Grid.Column="1" Height="90" Width="70" CornerRadius="10" Background="#EDF1F8" ClipToBounds="True">
                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
@@ -85,23 +112,15 @@
 
                                         <StackPanel Grid.Column="2" Margin="14,0,18,0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold" Foreground="#101828" TextWrapping="Wrap"/>
-                                            <TextBlock Text="{Binding Author}" Foreground="#667085" Margin="0,2,0,6"/>
+                                            <TextBlock Text="{Binding Author}" Foreground="#667085" Margin="0,2,0,4"/>
+                                            <TextBlock Text="{Binding Description}" Foreground="#475467" FontSize="13" TextTrimming="CharacterEllipsis" MaxWidth="320" Cursor="Hand" MouseLeftButtonUp="DescriptionTextBlock_MouseLeftButtonUp" ToolTip="Нажмите, чтобы развернуть описание"/>
                                             <Border Background="#FFE6F1" Padding="8,2" CornerRadius="7" HorizontalAlignment="Left"
                                                     Visibility="{Binding HasBulkDiscount, Converter={StaticResource BoolToVisibility}}">
                                                 <TextBlock Text="% Скидка от 2 ед" Foreground="#D21A74" FontWeight="SemiBold" FontSize="12"/>
                                             </Border>
                                         </StackPanel>
 
-                                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="0,0,20,0">
-                                            <TextBlock Text="{Binding TotalPrice, StringFormat={}{0:N0} ₽}" Foreground="#00A651" FontSize="22" FontWeight="Bold" HorizontalAlignment="Right"/>
-                                            <TextBlock Text="{Binding OriginalTotalPrice, StringFormat={}{0:N0} ₽}" Foreground="#98A2B3" FontSize="15" HorizontalAlignment="Right"
-                                                       TextDecorations="Strikethrough"
-                                                       Visibility="{Binding HasBulkDiscount, Converter={StaticResource BoolToVisibility}}"/>
-                                        </StackPanel>
-
-                                        <Button Grid.Column="4" Content="🗑" Style="{StaticResource DeleteButtonStyle}" Tag="{Binding}" Click="RemoveItemButton_Click" Margin="0,0,12,0" VerticalAlignment="Center"/>
-
-                                        <Border Grid.Column="5" Background="#EEF2F8" CornerRadius="10" Padding="6" VerticalAlignment="Center">
+                                        <Border Grid.Column="3" Background="#EEF2F8" CornerRadius="10" Padding="6" VerticalAlignment="Center" Margin="0,0,20,0">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="42"/>
@@ -113,6 +132,21 @@
                                                 <Button Grid.Column="2" Content="+" FontSize="22" FontWeight="Bold" Tag="{Binding}" Click="IncreaseQuantityButton_Click" BorderThickness="0" Background="Transparent" Cursor="Hand"/>
                                             </Grid>
                                         </Border>
+
+                                        <StackPanel Grid.Column="4" VerticalAlignment="Center" Margin="0,0,12,0">
+                                            <TextBlock Text="{Binding TotalPrice, StringFormat={}{0:N0} ₽}" Foreground="#00A651" FontSize="22" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding OriginalTotalPrice, StringFormat={}{0:N0} ₽}" Foreground="#98A2B3" FontSize="15" HorizontalAlignment="Right"
+                                                       TextDecorations="Strikethrough"
+                                                       Visibility="{Binding HasBulkDiscount, Converter={StaticResource BoolToVisibility}}"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="5" Content="🗑" Style="{StaticResource DeleteButtonStyle}" Tag="{Binding}" Click="RemoveItemButton_Click" VerticalAlignment="Center"/>
+
+                                        <Popup IsOpen="{Binding IsDescriptionExpanded}" Placement="Center" StaysOpen="True" AllowsTransparency="True">
+                                            <Border Background="#F8FAFF" BorderBrush="#CFD8F6" BorderThickness="1" CornerRadius="12" Padding="14" Width="460">
+                                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#344054" FontSize="14"/>
+                                            </Border>
+                                        </Popup>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
