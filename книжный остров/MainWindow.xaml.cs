@@ -165,10 +165,22 @@ namespace WpfAppBookStore
                 return;
             }
 
+            CartSession.AddBook(selectedBook);
+
             MessageBox.Show($"Книга добавлена в корзину!\n\n📚 {selectedBook.Title}\n✍️ {selectedBook.Author}\n💰 {selectedBook.Price} ₽",
                 "Успех",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+
+        private void CartButton_Click(object sender, RoutedEventArgs e)
+        {
+            CartWindow cartWindow = new()
+            {
+                Owner = this
+            };
+            cartWindow.ShowDialog();
         }
 
         private void ProfileButton_Click(object sender, RoutedEventArgs e)
