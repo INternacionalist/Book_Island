@@ -1,15 +1,11 @@
 ﻿<Window x:Class="WpfAppBookStore.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Вход в систему" Height="380" Width="320"
+        Title="Вход в систему" Height="520" Width="340"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Background="White" Topmost="True">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="217*"/>
-            <ColumnDefinition Width="103*"/>
-        </Grid.ColumnDefinitions>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#FFFFFF" Offset="0"/>
@@ -17,36 +13,26 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <StackPanel VerticalAlignment="Center" Margin="30,0,30,0" Grid.ColumnSpan="2">
+        <StackPanel x:Name="LoginPanel" VerticalAlignment="Center" Margin="30,0,30,0">
+            <TextBlock Text="🔐 ВХОД" HorizontalAlignment="Center"
+                       FontSize="24" FontWeight="Bold" Margin="0,0,0,25" Foreground="#333"/>
 
-            <TextBlock Text="🔐 ВХОД" HorizontalAlignment="Center" 
-                       FontSize="24" FontWeight="Bold" Margin="0,0,0,25" Foreground="#333" Height="34"/>
-
-            <!-- Логин -->
             <TextBlock Text="Логин:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12">
-                <Border.Background>
-                    <SolidColorBrush Color="White"/>
-                </Border.Background>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
                 <TextBox x:Name="UserLogin" Padding="10,8" BorderThickness="0" FontSize="13"/>
             </Border>
 
-            <!-- Пароль -->
             <TextBlock Text="Пароль:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,18">
-                <Border.Background>
-                    <SolidColorBrush Color="White"/>
-                </Border.Background>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,18" Background="White">
                 <PasswordBox x:Name="UserPass" Padding="10,8" BorderThickness="0" FontSize="13"/>
             </Border>
 
-            <!-- Войти -->
             <Button Content="✓ ВОЙТИ" Margin="0,0,0,10" Height="40"
                     Background="#333" Foreground="White" FontWeight="Bold" FontSize="13"
                     Click="LoginBtn_Click" Cursor="Hand">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6" 
+                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
                                 Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -59,14 +45,13 @@
                 </Button.Template>
             </Button>
 
-            <!-- Регистрация -->
             <Button Content="+ РЕГИСТРАЦИЯ" Height="40"
-                    Background="White" Foreground="#333" BorderBrush="#333" BorderThickness="2" 
+                    Background="White" Foreground="#333" BorderBrush="#333" BorderThickness="2"
                     FontWeight="Bold" FontSize="13"
-                    Click="RegBtn_Click" Cursor="Hand">
+                    Click="OpenRegistrationBtn_Click" Cursor="Hand">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6" 
+                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
                                 Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -78,6 +63,54 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
+        </StackPanel>
+
+        <StackPanel x:Name="RegistrationPanel" VerticalAlignment="Center" Margin="30,20,30,20" Visibility="Collapsed">
+            <TextBlock Text="📝 РЕГИСТРАЦИЯ" HorizontalAlignment="Center"
+                       FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#333"/>
+
+            <TextBlock Text="Имя (Login):" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
+                <TextBox x:Name="RegName" Padding="10,8" BorderThickness="0" FontSize="13"/>
+            </Border>
+
+            <TextBlock Text="Фамилия:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
+                <TextBox x:Name="RegLastName" Padding="10,8" BorderThickness="0" FontSize="13"/>
+            </Border>
+
+            <TextBlock Text="Номер телефона:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
+                <TextBox x:Name="RegPhone" Padding="10,8" BorderThickness="0" FontSize="13"/>
+            </Border>
+
+            <TextBlock Text="Пароль:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
+            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,18" Background="White">
+                <PasswordBox x:Name="RegPass" Padding="10,8" BorderThickness="0" FontSize="13"/>
+            </Border>
+
+            <Button Content="ЗАРЕГИСТРИРОВАТЬСЯ" Height="40" Margin="0,0,0,10"
+                    Background="#333" Foreground="White" FontWeight="Bold" FontSize="13"
+                    Click="RegBtn_Click" Cursor="Hand">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button Content="← НАЗАД К ВХОДУ" Height="36"
+                    Background="White" Foreground="#333" BorderBrush="#333" BorderThickness="2"
+                    FontWeight="Bold" FontSize="12"
+                    Click="BackToLoginBtn_Click" Cursor="Hand"/>
         </StackPanel>
     </Grid>
 </Window>
