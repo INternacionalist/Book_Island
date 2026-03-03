@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Data.SqlClient;
 
 namespace WpfAppBookStore
 {
     public partial class MainWindow : Window
     {
-        private bool isDarkTheme = false;
         private string connectionString = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
+        private readonly List<Book> cartBooks = new List<Book>();
 
         public MainWindow()
         {
@@ -77,37 +76,6 @@ namespace WpfAppBookStore
             }
         }
 
-        // Переключение темы
-        private void ThemeBtn_Click(object sender, RoutedEventArgs e)
-        {
-            var gradient = (LinearGradientBrush)MainGrid.Background;
-
-            ColorAnimation anim1 = new ColorAnimation();
-            ColorAnimation anim2 = new ColorAnimation();
-            anim1.Duration = new TimeSpan(0, 0, 0, 0, 500);
-            anim2.Duration = new TimeSpan(0, 0, 0, 0, 500);
-
-            if (isDarkTheme)
-            {
-                // Светлая тема
-                anim1.To = Color.FromRgb(255, 255, 255);
-                anim2.To = Color.FromRgb(245, 245, 245);
-                isDarkTheme = false;
-                ThemeBtn.Content = "🌙 тема";
-            }
-            else
-            {
-                // Темная тема
-                anim1.To = Color.FromRgb(40, 40, 40);
-                anim2.To = Color.FromRgb(60, 60, 60);
-                isDarkTheme = true;
-                ThemeBtn.Content = "☀️ тема";
-            }
-
-            gradient.GradientStops[0].BeginAnimation(GradientStop.ColorProperty, anim1);
-            gradient.GradientStops[1].BeginAnimation(GradientStop.ColorProperty, anim2);
-        }
-
         // Кнопка "Купить"
         private void BuyButton_Click(object sender, RoutedEventArgs e)
         {
@@ -127,6 +95,9 @@ namespace WpfAppBookStore
 
             if (selectedBook != null)
             {
+                cartBooks.Add(selectedBook);
+                CartBtn.Content = $"🛒 корзина ({cartBooks.Count})";
+
                 MessageBox.Show(
                     $"Книга добавлена в корзину!\n\n" +
                     $"📚 {selectedBook.Title}\n" +
@@ -139,11 +110,36 @@ namespace WpfAppBookStore
             }
         }
 
+        private void CartBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (cartBooks.Count == 0)
+            {
+                MessageBox.Show("Корзина пока пустая.", "Корзина", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            decimal totalPrice = 0;
+            List<string> cartItems = new List<string>();
+
+            foreach (Book book in cartBooks)
+            {
+                totalPrice += book.Price;
+                cartItems.Add($"• {book.Title} — {book.Price} ₽");
+            }
+
+            MessageBox.Show(
+                $"В корзине {cartBooks.Count} книг(и):\n\n{string.Join("\n", cartItems)}\n\nИтого: {totalPrice} ₽",
+                "Корзина",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+        }
+
         // Открытие окна логина
         private void reg(object sender, RoutedEventArgs e)
         {
             // Если у тебя есть окно LoginWindow
-            LoginWindow loginWindow = new LoginWindow();3
+            LoginWindow loginWindow = new LoginWindow();
             loginWindow.Owner = this;
             loginWindow.ShowDialog();
         }

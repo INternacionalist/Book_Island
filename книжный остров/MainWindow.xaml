@@ -110,11 +110,11 @@
                              Foreground="#666"/>
                 </Border>
 
-                <!-- Кнопка темы -->
-                <Button x:Name="ThemeBtn" Grid.Column="2" Content="🌙 тема" 
-                        Width="100" Height="50" Margin="20,0"
+                <!-- Кнопка корзины -->
+                <Button x:Name="CartBtn" Grid.Column="2" Content="🛒 корзина (0)" 
+                        Width="140" Height="50" Margin="20,0"
                         Background="Transparent" BorderBrush="#333" BorderThickness="2"
-                        FontSize="14" Cursor="Hand" Click="ThemeBtn_Click">
+                        FontSize="14" Cursor="Hand" Click="CartBtn_Click">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" 
