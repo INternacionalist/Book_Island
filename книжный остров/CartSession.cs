@@ -69,6 +69,11 @@ namespace WpfAppBookStore
     {
         public static ObservableCollection<CartItem> Items { get; } = new();
 
+        public static bool ContainsBook(int bookId)
+        {
+            return Items.Any(item => item.BookID == bookId);
+        }
+
         public static void AddBook(MainWindow.Book book)
         {
             CartItem? existingItem = Items.FirstOrDefault(item => item.BookID == book.BookID);
@@ -89,6 +94,17 @@ namespace WpfAppBookStore
                 Quantity = 1,
                 IsSelected = true
             });
+        }
+
+        public static void RemoveBook(int bookId)
+        {
+            CartItem? existingItem = Items.FirstOrDefault(item => item.BookID == bookId);
+            if (existingItem == null)
+            {
+                return;
+            }
+
+            Items.Remove(existingItem);
         }
     }
 }

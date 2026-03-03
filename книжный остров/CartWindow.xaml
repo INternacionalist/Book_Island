@@ -6,6 +6,31 @@
         Background="#F2F4F8">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <Style x:Key="DeleteButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="#EEF2F8"/>
+            <Setter Property="Foreground" Value="#1D2939"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FDEBED"/>
+                    <Setter Property="Foreground" Value="#D92D20"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="20">
@@ -27,12 +52,17 @@
         </Border>
 
         <Border Grid.Row="1" Margin="0,14,0,14" Background="#FBFCFE" CornerRadius="20" BorderBrush="#E8ECF4" BorderThickness="1" Padding="14">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
                 <Border Background="#EDF1F8" CornerRadius="12" Padding="14" Margin="0,0,0,12">
                     <TextBlock Text="Доступны для заказа" FontWeight="SemiBold" Foreground="#1D2939" FontSize="22"/>
                 </Border>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" PanningMode="VerticalOnly">
                     <ItemsControl x:Name="CartItemsControl">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -42,6 +72,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="90"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
@@ -68,7 +99,9 @@
                                                        Visibility="{Binding HasBulkDiscount, Converter={StaticResource BoolToVisibility}}"/>
                                         </StackPanel>
 
-                                        <Border Grid.Column="4" Background="#EEF2F8" CornerRadius="10" Padding="6" VerticalAlignment="Center">
+                                        <Button Grid.Column="4" Content="🗑" Style="{StaticResource DeleteButtonStyle}" Tag="{Binding}" Click="RemoveItemButton_Click" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                                        <Border Grid.Column="5" Background="#EEF2F8" CornerRadius="10" Padding="6" VerticalAlignment="Center">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="42"/>
@@ -86,7 +119,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="#E8ECF4" BorderThickness="1" CornerRadius="16" Padding="16">

@@ -71,12 +71,20 @@
         </Style>
 
         <Style x:Key="BuyButtonStyle" TargetType="Button">
+            <Setter Property="Content" Value="Купить"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -90,6 +98,20 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
                 </Trigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=DataContext.IsInCart}" Value="True">
+                    <Setter Property="Content" Value="В корзине"/>
+                    <Setter Property="Background" Value="#00A651"/>
+                    <Setter Property="Padding" Value="16,8"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" From="0.92" To="1" Duration="0:0:0.18"/>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" From="0.92" To="1" Duration="0:0:0.18"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
@@ -145,7 +167,7 @@
                                                 <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}"/>
                                                 <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" FontSize="12"/>
                                             </StackPanel>
-                                            <Button Grid.Column="1" Content="В корзину" Style="{StaticResource BuyButtonStyle}" Tag="{Binding BookID}" Margin="12,0,0,0" Click="BuyButton_Click"/>
+                                            <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Margin="12,0,0,0" Click="BuyButton_Click"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -201,7 +223,7 @@
                                             <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}">
                                                 <Run Text="{Binding Price}"/><Run Text=" ₽"/>
                                             </TextBlock>
-                                            <Button Grid.Column="1" Content="Купить" Style="{StaticResource BuyButtonStyle}" Tag="{Binding BookID}" Click="BuyButton_Click"/>
+                                            <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Click="BuyButton_Click"/>
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
