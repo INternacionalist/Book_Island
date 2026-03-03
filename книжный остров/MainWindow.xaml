@@ -160,14 +160,19 @@
                                     <DataTemplate>
                                         <Grid Margin="4">
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="54"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <StackPanel>
+                                            <Border Grid.Column="0" Height="54" Width="42" CornerRadius="8" Background="#EEF2FF" ClipToBounds="True">
+                                                <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
                                                 <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}"/>
+                                                <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" FontSize="12"/>
                                             </StackPanel>
-                                            <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Margin="12,0,0,0" Click="BuyButton_Click"/>
+                                            <Button Grid.Column="2" Style="{StaticResource BuyButtonStyle}" Margin="12,0,0,0" Click="BuyButton_Click"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -214,6 +219,7 @@
                                     </Border>
                                     <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
+                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34"/>
                                         <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -260,6 +266,7 @@
                                                         </Border>
                                                         <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                                             <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="40"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="32" Margin="0,4,0,0"/>
                                                             <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,6"/>
                                                             <TextBlock Foreground="{StaticResource PrimaryDarkBrush}" FontWeight="Bold">
                                                                 <Run Text="{Binding Price}"/><Run Text=" ₽"/>
