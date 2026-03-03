@@ -4,6 +4,8 @@
         Title="Корзина" Height="620" Width="900"
         WindowStartupLocation="CenterOwner"
         Background="#F2F4F8"
+        MinWidth="760"
+        MinHeight="520"
         PreviewMouseDown="Window_PreviewMouseDown">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -60,7 +62,8 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="20" MinWidth="700">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -167,4 +170,5 @@
             </Grid>
         </Border>
     </Grid>
+    </ScrollViewer>
 </Window>

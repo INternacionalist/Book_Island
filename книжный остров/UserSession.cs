@@ -7,13 +7,15 @@ namespace WpfAppBookStore
         public static string LastName { get; private set; } = string.Empty;
         public static string PhoneNumber { get; private set; } = string.Empty;
         public static int UserId { get; private set; }
+        public static string RegistrationDateText { get; private set; } = string.Empty;
 
-        public static void Login(string userName, string lastName = "", string phoneNumber = "", int userId = 0)
+        public static void Login(string userName, string lastName = "", string phoneNumber = "", int userId = 0, string registrationDateText = "")
         {
             UserName = userName;
             LastName = lastName;
             PhoneNumber = phoneNumber;
             UserId = userId;
+            RegistrationDateText = registrationDateText;
             IsAuthenticated = true;
         }
 
@@ -23,6 +25,7 @@ namespace WpfAppBookStore
             LastName = string.Empty;
             PhoneNumber = string.Empty;
             UserId = 0;
+            RegistrationDateText = string.Empty;
             IsAuthenticated = false;
         }
     }
