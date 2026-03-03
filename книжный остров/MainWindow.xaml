@@ -96,7 +96,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="96"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -107,7 +107,6 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -155,8 +154,7 @@
                     </Popup>
                 </Grid>
 
-                <Button x:Name="ThemeBtn" Grid.Column="1" Content="🌙 Тема" Width="110" Margin="16,0" Style="{StaticResource HeaderActionButtonStyle}" Click="ThemeBtn_Click"/>
-                <Button x:Name="ProfileButton" Grid.Column="2" Width="132" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
+                <Button x:Name="ProfileButton" Grid.Column="1" Width="132" Margin="16,0,0,0" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
             </Grid>
         </Border>
 

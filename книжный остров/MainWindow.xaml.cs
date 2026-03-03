@@ -7,14 +7,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
 namespace WpfAppBookStore
 {
     public partial class MainWindow : Window
     {
-        private bool isDarkTheme;
         private readonly string connectionString = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
         private readonly List<Book> allBooks = new();
 
@@ -53,26 +51,42 @@ namespace WpfAppBookStore
                 using SqlConnection conn = new(connectionString);
                 conn.Open();
 
-                string query = @"SELECT BookID, Title, Author, Price, Description, CoverImage, Genre, PublishYear, InStock 
-                                 FROM dbo.Books
-                                 WHERE InStock = 1";
+                bool hasCoverImageColumn = HasColumn(conn, "dbo", "Books", "CoverImage");
+                string coverImageSelect = hasCoverImageColumn
+                    ? "b.CoverImage"
+                    : "CAST(NULL AS varbinary(max)) AS CoverImage";
+
+                string query = $@"SELECT b.BookID, b.Title, b.Author, b.Price, b.Description, b.Genre, b.PublishYear, b.InStock,
+                                         {coverImageSelect}
+                                  FROM dbo.Books b
+                                  WHERE b.InStock = 1";
 
                 using SqlCommand cmd = new(query, conn);
                 using SqlDataReader reader = cmd.ExecuteReader();
+
+                int bookIdOrdinal = reader.GetOrdinal("BookID");
+                int titleOrdinal = reader.GetOrdinal("Title");
+                int authorOrdinal = reader.GetOrdinal("Author");
+                int priceOrdinal = reader.GetOrdinal("Price");
+                int descriptionOrdinal = reader.GetOrdinal("Description");
+                int genreOrdinal = reader.GetOrdinal("Genre");
+                int publishYearOrdinal = reader.GetOrdinal("PublishYear");
+                int inStockOrdinal = reader.GetOrdinal("InStock");
+                int coverImageOrdinal = reader.GetOrdinal("CoverImage");
 
                 while (reader.Read())
                 {
                     allBooks.Add(new Book
                     {
-                        BookID = reader.GetInt32(0),
-                        Title = reader.IsDBNull(1) ? "Без названия" : reader.GetString(1),
-                        Author = reader.IsDBNull(2) ? "Неизвестный автор" : reader.GetString(2),
-                        Price = reader.IsDBNull(3) ? 0 : reader.GetDecimal(3),
-                        Description = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                        CoverImage = reader.IsDBNull(5) ? BuildPlaceholderImage() : BuildImage(reader.GetSqlBinary(5).Value),
-                        Genre = reader.IsDBNull(6) ? "Без жанра" : reader.GetString(6),
-                        PublishYear = reader.IsDBNull(7) ? 0 : reader.GetInt32(7),
-                        InStock = reader.GetBoolean(8)
+                        BookID = reader.GetInt32(bookIdOrdinal),
+                        Title = reader.IsDBNull(titleOrdinal) ? "Без названия" : reader.GetString(titleOrdinal),
+                        Author = reader.IsDBNull(authorOrdinal) ? "Неизвестный автор" : reader.GetString(authorOrdinal),
+                        Price = reader.IsDBNull(priceOrdinal) ? 0 : reader.GetDecimal(priceOrdinal),
+                        Description = reader.IsDBNull(descriptionOrdinal) ? string.Empty : reader.GetString(descriptionOrdinal),
+                        CoverImage = reader.IsDBNull(coverImageOrdinal) ? BuildPlaceholderImage() : BuildImage((byte[])reader[coverImageOrdinal]),
+                        Genre = reader.IsDBNull(genreOrdinal) ? "Без жанра" : reader.GetString(genreOrdinal),
+                        PublishYear = reader.IsDBNull(publishYearOrdinal) ? 0 : reader.GetInt32(publishYearOrdinal),
+                        InStock = reader.GetBoolean(inStockOrdinal)
                     });
                 }
 
@@ -82,6 +96,23 @@ namespace WpfAppBookStore
             {
                 MessageBox.Show($"Ошибка загрузки книг:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private static bool HasColumn(SqlConnection connection, string schemaName, string tableName, string columnName)
+        {
+            const string query = @"SELECT COUNT(1)
+                                   FROM INFORMATION_SCHEMA.COLUMNS
+                                   WHERE TABLE_SCHEMA = @schemaName
+                                     AND TABLE_NAME = @tableName
+                                     AND COLUMN_NAME = @columnName";
+
+            using SqlCommand cmd = new(query, connection);
+            cmd.Parameters.AddWithValue("@schemaName", schemaName);
+            cmd.Parameters.AddWithValue("@tableName", tableName);
+            cmd.Parameters.AddWithValue("@columnName", columnName);
+
+            object? result = cmd.ExecuteScalar();
+            return result is int count && count > 0;
         }
 
         private void BindSections()
@@ -119,54 +150,6 @@ namespace WpfAppBookStore
             byte[] imageBytes = Convert.FromBase64String(
                 "iVBORw0KGgoAAAANSUhEUgAAAEAAAABQCAIAAAD6xG44AAAAiElEQVR4nO3PQQ3AIBDAsAP/nkEEj4ZkVbDX1pk5M+/w5wBnGdAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNBW5wFB7fN6mQAAAABJRU5ErkJggg==");
             return BuildImage(imageBytes);
-        }
-
-        private void ThemeBtn_Click(object sender, RoutedEventArgs e)
-        {
-            ColorAnimation foregroundAnimation = new()
-            {
-                Duration = TimeSpan.FromMilliseconds(300)
-            };
-
-            if (isDarkTheme)
-            {
-                Background = new SolidColorBrush(Color.FromRgb(242, 246, 255));
-                foregroundAnimation.To = Color.FromRgb(24, 32, 51);
-                ThemeBtn.Content = "🌙 Тема";
-                isDarkTheme = false;
-            }
-            else
-            {
-                Background = new SolidColorBrush(Color.FromRgb(23, 30, 52));
-                foregroundAnimation.To = Color.FromRgb(229, 236, 255);
-                ThemeBtn.Content = "☀️ Тема";
-                isDarkTheme = true;
-            }
-
-            foreach (TextBlock textBlock in FindVisualChildren<TextBlock>(this))
-            {
-                if (textBlock.Foreground is SolidColorBrush brush)
-                {
-                    brush.BeginAnimation(SolidColorBrush.ColorProperty, foregroundAnimation);
-                }
-            }
-        }
-
-        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
-                if (child is T typed)
-                {
-                    yield return typed;
-                }
-
-                foreach (T sub in FindVisualChildren<T>(child))
-                {
-                    yield return sub;
-                }
-            }
         }
 
         private void BuyButton_Click(object sender, RoutedEventArgs e)
