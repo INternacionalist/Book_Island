@@ -109,6 +109,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
@@ -156,7 +157,8 @@
                 </Grid>
 
                 <Button x:Name="ThemeBtn" Grid.Column="1" Content="🌙 Тема" Width="110" Margin="16,0" Style="{StaticResource HeaderActionButtonStyle}" Click="ThemeBtn_Click"/>
-                <Button x:Name="ProfileButton" Grid.Column="2" Width="132" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
+                <Button x:Name="CartButton" Grid.Column="2" Width="150" Margin="0,0,12,0" Content="🛒 Корзина (0)" Style="{StaticResource HeaderActionButtonStyle}" Click="CartButton_Click"/>
+                <Button x:Name="ProfileButton" Grid.Column="3" Width="132" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
             </Grid>
         </Border>
 

@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,11 +18,13 @@ namespace WpfAppBookStore
         private bool isDarkTheme;
         private readonly string connectionString = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
         private readonly List<Book> allBooks = new();
+        private readonly ObservableCollection<CartItem> cartItems = new();
 
         public MainWindow()
         {
             InitializeComponent();
             UpdateProfileButton();
+            UpdateCartButton();
             LoadBooks();
         }
 
@@ -186,6 +189,36 @@ namespace WpfAppBookStore
                 "Успех",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+
+            CartItem? existing = cartItems.FirstOrDefault(item => item.BookID == selectedBook.BookID);
+            if (existing != null)
+            {
+                existing.Quantity += 1;
+            }
+            else
+            {
+                cartItems.Add(new CartItem
+                {
+                    BookID = selectedBook.BookID,
+                    Title = selectedBook.Title,
+                    UnitPrice = selectedBook.Price,
+                    CoverImage = selectedBook.CoverImage,
+                    Quantity = 1,
+                    IsSelected = true
+                });
+            }
+
+            UpdateCartButton();
+        }
+
+        private void CartButton_Click(object sender, RoutedEventArgs e)
+        {
+            CartWindow cartWindow = new(cartItems)
+            {
+                Owner = this
+            };
+            cartWindow.ShowDialog();
+            UpdateCartButton();
         }
 
         private void ProfileButton_Click(object sender, RoutedEventArgs e)
@@ -218,6 +251,12 @@ namespace WpfAppBookStore
             ProfileButton.Content = UserSession.IsAuthenticated
                 ? $"👤 {UserSession.UserName}"
                 : "👤 Логин";
+        }
+
+        private void UpdateCartButton()
+        {
+            int totalQuantity = cartItems.Sum(item => item.Quantity);
+            CartButton.Content = $"🛒 Корзина ({totalQuantity})";
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
