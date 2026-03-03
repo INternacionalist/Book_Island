@@ -92,6 +92,19 @@ namespace WpfAppBookStore
             UpdateTotal();
         }
 
+
+        private void RemoveItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button { Tag: CartItem item })
+            {
+                return;
+            }
+
+            CartSession.RemoveBook(item.BookID);
+            UpdateSelectAllState();
+            UpdateTotal();
+        }
+
         private void UpdateSelectAllState()
         {
             if (CartSession.Items.Count == 0)

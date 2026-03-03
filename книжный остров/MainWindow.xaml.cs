@@ -1,6 +1,7 @@
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -21,10 +22,13 @@ namespace WpfAppBookStore
             InitializeComponent();
             UpdateProfileButton();
             LoadBooks();
+            CartSession.Items.CollectionChanged += (_, _) => RefreshBooksCartState();
         }
 
-        public class Book
+        public class Book : INotifyPropertyChanged
         {
+            private bool isInCart;
+
             public int BookID { get; set; }
             public string Title { get; set; } = string.Empty;
             public string Author { get; set; } = "Неизвестный автор";
@@ -34,6 +38,23 @@ namespace WpfAppBookStore
             public int PublishYear { get; set; }
             public bool InStock { get; set; }
             public ImageSource? CoverImage { get; set; }
+
+            public bool IsInCart
+            {
+                get => isInCart;
+                set
+                {
+                    if (isInCart == value)
+                    {
+                        return;
+                    }
+
+                    isInCart = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsInCart)));
+                }
+            }
+
+            public event PropertyChangedEventHandler? PropertyChanged;
         }
 
         public class GenreGroup
@@ -86,7 +107,8 @@ namespace WpfAppBookStore
                         CoverImage = reader.IsDBNull(coverImageOrdinal) ? BuildPlaceholderImage() : BuildImage((byte[])reader[coverImageOrdinal]),
                         Genre = reader.IsDBNull(genreOrdinal) ? "Без жанра" : reader.GetString(genreOrdinal),
                         PublishYear = reader.IsDBNull(publishYearOrdinal) ? 0 : reader.GetInt32(publishYearOrdinal),
-                        InStock = reader.GetBoolean(inStockOrdinal)
+                        InStock = reader.GetBoolean(inStockOrdinal),
+                        IsInCart = CartSession.ContainsBook(reader.GetInt32(bookIdOrdinal))
                     });
                 }
 
@@ -154,33 +176,34 @@ namespace WpfAppBookStore
 
         private void BuyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button btn || btn.Tag is not int bookId)
+            if (sender is not Button { DataContext: Book selectedBook })
             {
                 return;
             }
 
-            Book? selectedBook = allBooks.FirstOrDefault(b => b.BookID == bookId);
-            if (selectedBook == null)
+            if (selectedBook.IsInCart)
             {
+                OpenCartWindow();
                 return;
             }
 
             CartSession.AddBook(selectedBook);
-
-            MessageBox.Show($"Книга добавлена в корзину!\n\n📚 {selectedBook.Title}\n✍️ {selectedBook.Author}\n💰 {selectedBook.Price} ₽",
-                "Успех",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            selectedBook.IsInCart = true;
         }
 
-
         private void CartButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenCartWindow();
+        }
+
+        private void OpenCartWindow()
         {
             CartWindow cartWindow = new()
             {
                 Owner = this
             };
             cartWindow.ShowDialog();
+            RefreshBooksCartState();
         }
 
         private void ProfileButton_Click(object sender, RoutedEventArgs e)
@@ -213,6 +236,15 @@ namespace WpfAppBookStore
             ProfileButton.Content = UserSession.IsAuthenticated
                 ? $"👤 {UserSession.UserName}"
                 : "👤 Логин";
+        }
+
+
+        private void RefreshBooksCartState()
+        {
+            foreach (Book book in allBooks)
+            {
+                book.IsInCart = CartSession.ContainsBook(book.BookID);
+            }
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
