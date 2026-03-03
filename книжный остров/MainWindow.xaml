@@ -5,7 +5,6 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <!-- Стиль для карточки книги -->
         <Style x:Key="BookCardStyle" TargetType="Border">
             <Setter Property="Background" Value="White"/>
             <Setter Property="CornerRadius" Value="8"/>
@@ -27,7 +26,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Стиль для кнопки "Купить" -->
         <Style x:Key="BuyButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF6B35"/>
             <Setter Property="Foreground" Value="White"/>
@@ -39,9 +37,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="6" 
-                                Padding="{TemplateBinding Padding}">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -71,7 +67,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Шапка -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <Grid Margin="20,10">
                 <Grid.ColumnDefinitions>
@@ -79,13 +74,13 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Кнопка меню -->
-                <Button Grid.Column="0" Width="50" Height="50" Background="Transparent" 
+                <Button Grid.Column="0" Width="50" Height="50" Background="Transparent"
                         BorderThickness="2" BorderBrush="#333" Margin="0,0,20,0" Cursor="Hand">
                     <Button.Template>
-                        <ControlTemplate>
+                        <ControlTemplate TargetType="Button">
                             <Border Background="Transparent" BorderBrush="#333" BorderThickness="2" CornerRadius="8">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <Rectangle Width="25" Height="3" Fill="#333" Margin="0,3"/>
@@ -97,47 +92,50 @@
                     </Button.Template>
                 </Button>
 
-                <!-- Поиск -->
-                <Border Grid.Column="1" Background="White" CornerRadius="25" 
-                        BorderBrush="#DDD" BorderThickness="2" Height="50">
-                    <TextBox x:Name="SearchBox" 
-                             Text="Поиск..." 
-                             VerticalAlignment="Center" 
-                             Padding="20,0" 
-                             FontSize="16" 
+                <Border Grid.Column="1" Background="White" CornerRadius="25" BorderBrush="#DDD" BorderThickness="2" Height="50">
+                    <TextBox x:Name="SearchBox"
+                             Text="Поиск..."
+                             VerticalAlignment="Center"
+                             Padding="20,0"
+                             FontSize="16"
                              BorderThickness="0"
                              GotFocus="SearchBox_GotFocus"
                              Foreground="#666"/>
                 </Border>
 
-                <!-- Кнопка темы -->
-                <Button x:Name="ThemeBtn" Grid.Column="2" Content="🌙 тема" 
-                        Width="100" Height="50" Margin="20,0"
+                <Button x:Name="ThemeBtn" Grid.Column="2" Content="🌙 тема"
+                        Width="100" Height="50" Margin="20,0,10,0"
                         Background="Transparent" BorderBrush="#333" BorderThickness="2"
                         FontSize="14" Cursor="Hand" Click="ThemeBtn_Click">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
 
-                <!-- Кнопка логина -->
-                <Button Grid.Column="3" Content="👤 логин" 
+                <Button Grid.Column="3" Content="🛒 корзина"
+                        Width="110" Height="50" Margin="0,0,10,0"
+                        Background="Transparent" BorderBrush="#333" BorderThickness="2"
+                        FontSize="14" Cursor="Hand" Click="CartButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button Grid.Column="4" Content="👤 логин"
                         Width="100" Height="50"
                         Background="Transparent" BorderBrush="#333" BorderThickness="2"
                         FontSize="14" Cursor="Hand" Click="reg">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </ControlTemplate>
@@ -146,107 +144,167 @@
             </Grid>
         </Border>
 
-        <!-- Контент -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20">
-            <StackPanel>
-                <!-- Заголовок секции -->
-                <Button Content="🔥 популярные ->" 
-                        HorizontalAlignment="Left" 
-                        Margin="10,20,0,20"
-                        Background="Transparent" 
-                        BorderBrush="#333" 
-                        BorderThickness="2" 
-                        Padding="15,8" 
-                        FontSize="16" 
-                        FontWeight="Bold"
-                        Cursor="Hand">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="8"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+        <Grid Grid.Row="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20">
+                <StackPanel>
+                    <Button Content="🔥 популярные ->"
+                            HorizontalAlignment="Left"
+                            Margin="10,20,0,20"
+                            Background="Transparent"
+                            BorderBrush="#333"
+                            BorderThickness="2"
+                            Padding="15,8"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
 
-                <!-- Каталог книг -->
-                <ItemsControl x:Name="BooksItemsControl">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                    <ItemsControl x:Name="BooksItemsControl">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <!-- Карточка книги -->
-                            <Border Style="{StaticResource BookCardStyle}" Width="250" Height="420">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="280"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource BookCardStyle}" Width="250" Height="420">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="280"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <!-- Обложка книги -->
-                                    <Border Grid.Row="0" Background="#F0F0F0" CornerRadius="6" Margin="0,0,0,15">
-                                        <Image Source="{Binding CoverURL}" 
-                                               Stretch="Uniform" 
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                                    </Border>
+                                        <Border Grid.Row="0" Background="#F0F0F0" CornerRadius="6" Margin="0,0,0,15">
+                                            <Image Source="{Binding CoverURL}" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
 
-                                    <!-- Информация о книге -->
-                                    <StackPanel Grid.Row="1">
-                                        <!-- Название -->
-                                        <TextBlock Text="{Binding Title}" 
-                                                   FontSize="16" 
-                                                   FontWeight="SemiBold" 
-                                                   TextWrapping="Wrap" 
-                                                   MaxHeight="45"
-                                                   Margin="0,0,0,5"
-                                                   Foreground="#333"/>
+                                        <StackPanel Grid.Row="1">
+                                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="45" Margin="0,0,0,5" Foreground="#333"/>
+                                            <TextBlock Text="{Binding Author}" FontSize="13" Foreground="#666" Margin="0,0,0,10"/>
 
-                                        <!-- Автор -->
-                                        <TextBlock Text="{Binding Author}" 
-                                                   FontSize="13" 
-                                                   Foreground="#666"
-                                                   Margin="0,0,0,10"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
 
-                                        <!-- Цена и кнопка -->
+                                                <TextBlock Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="#FF6B35" VerticalAlignment="Center">
+                                                    <Run Text="{Binding Price}"/>
+                                                    <Run Text=" ₽" FontSize="16"/>
+                                                </TextBlock>
+
+                                                <Button Grid.Column="1"
+                                                        Content="Купить"
+                                                        Style="{StaticResource BuyButtonStyle}"
+                                                        Click="BuyButton_Click"
+                                                        Tag="{Binding BookID}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border x:Name="CartPanel"
+                    Width="420"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,20,20"
+                    Background="#F4F5F7"
+                    BorderBrush="#E6E8EC"
+                    BorderThickness="1"
+                    CornerRadius="20"
+                    Padding="14"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="White" CornerRadius="14" Padding="12" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="SelectAllCheckBox" Content="Выбрать все" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Click="SelectAllCheckBox_Click"/>
+                            <Button Grid.Column="1" Content="✕" Width="34" Height="34" FontSize="15" FontWeight="Bold" Background="#EFF1F4" BorderThickness="0" Cursor="Hand" Click="CloseCartButton_Click"/>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="CartItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" CornerRadius="16" Padding="12" Margin="0,0,0,10">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="84"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Цена -->
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock FontSize="20" 
-                                                           FontWeight="Bold" 
-                                                           Foreground="#FF6B35">
-                                                    <Run Text="{Binding Price}"/>
-                                                    <Run Text=" ₽" FontSize="16"/>
-                                                </TextBlock>
+                                            <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Top" Margin="0,4,10,0" Checked="CartItemSelectionChanged" Unchecked="CartItemSelectionChanged"/>
+                                            <Border Grid.Column="1" Width="74" Height="98" Background="#EEF0F4" CornerRadius="12" Margin="0,0,10,0">
+                                                <Image Source="{Binding CoverURL}" Stretch="Uniform"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="2" Margin="0,2,10,0">
+                                                <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="#1D2330" TextWrapping="Wrap"/>
+                                                <TextBlock Text="✂ Скидка от 2 ед" FontSize="12" FontWeight="SemiBold" Foreground="#E7287F" Margin="0,4,0,4"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding TotalPrice, StringFormat={}{0:F0} ₽}" FontSize="21" FontWeight="Bold" Foreground="#12B94A"/>
+                                                    <TextBlock Text="{Binding OldTotalPrice, StringFormat={}{0:F0} ₽}" Margin="8,5,0,0" FontSize="14" Foreground="#9AA3B2" TextDecorations="Strikethrough">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding HasDiscount}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <Button Content="🗑 удалить" Padding="10,5" Width="100" Margin="0,8,0,0" HorizontalAlignment="Left" Background="#EFF1F4" BorderThickness="0" Cursor="Hand" Click="RemoveCartItem_Click" Tag="{Binding BookID}"/>
                                             </StackPanel>
 
-                                            <!-- Кнопка купить -->
-                                            <Button Grid.Column="1" 
-                                                    Content="Купить" 
-                                                    Style="{StaticResource BuyButtonStyle}"
-                                                    Click="BuyButton_Click"
-                                                    Tag="{Binding BookID}"/>
+                                            <Border Grid.Column="3" Background="#EFF1F4" CornerRadius="16" Height="38" VerticalAlignment="Top" Padding="4,0">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="−" Width="30" Height="30" BorderThickness="0" Background="Transparent" FontSize="18" FontWeight="Bold" Cursor="Hand" Click="DecreaseQuantity_Click" Tag="{Binding BookID}"/>
+                                                    <TextBlock Text="{Binding Quantity}" Width="24" VerticalAlignment="Center" TextAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+                                                    <Button Content="+" Width="30" Height="30" BorderThickness="0" Background="Transparent" FontSize="18" FontWeight="Bold" Cursor="Hand" Click="IncreaseQuantity_Click" Tag="{Binding BookID}"/>
+                                                </StackPanel>
+                                            </Border>
                                         </Grid>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ScrollViewer>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="12" Margin="0,12,0,0">
+                        <StackPanel>
+                            <TextBlock x:Name="CartSummaryText" FontSize="14" Foreground="#5A6475"/>
+                            <TextBlock x:Name="CartTotalText" FontSize="24" FontWeight="Bold" Foreground="#1D2330"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
