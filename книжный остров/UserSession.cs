@@ -10,14 +10,22 @@ namespace WpfAppBookStore
         public static int UserId { get; private set; }
         public static string RegistrationDateText { get; private set; } = string.Empty;
 
-        public static void Login(string userName, string lastName = "", string phoneNumber = "", int userId = 0, string registrationDateText = "")
+        public static void Login(string userName, string lastName = "", string phoneNumber = "", int userId = 0, string registrationDateText = "", bool? isAdminOverride = null)
         {
             UserName = userName;
             LastName = lastName;
             PhoneNumber = phoneNumber;
             UserId = userId;
             RegistrationDateText = registrationDateText;
-            IsAdmin = userName.Trim().ToLowerInvariant() is "admin" or "administrator";
+            if (isAdminOverride.HasValue)
+            {
+                IsAdmin = isAdminOverride.Value;
+            }
+            else
+            {
+                string normalized = userName.Trim().ToLowerInvariant();
+                IsAdmin = normalized is "admin" or "administrator" or "джефри";
+            }
             IsAuthenticated = true;
         }
 
