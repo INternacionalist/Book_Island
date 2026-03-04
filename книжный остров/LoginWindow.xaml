@@ -1,116 +1,115 @@
 ﻿<Window x:Class="WpfAppBookStore.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Вход в систему" Height="520" Width="340"
+        Title="Вход в систему" Height="560" Width="420"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Background="White" Topmost="True">
+        Background="#F2F6FF" Topmost="True">
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#4B6BFB"/>
+        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#3553D8"/>
+        <SolidColorBrush x:Key="TextMainBrush" Color="#182033"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#65708A"/>
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FFFFFF" Offset="0"/>
-                <GradientStop Color="#F0F8FF" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
 
-        <StackPanel x:Name="LoginPanel" VerticalAlignment="Center" Margin="30,0,30,0">
-            <TextBlock Text="🔐 ВХОД" HorizontalAlignment="Center"
-                       FontSize="24" FontWeight="Bold" Margin="0,0,0,25" Foreground="#333"/>
+        <Style x:Key="InputBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#D6DDF4"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="2"/>
+        </Style>
 
-            <TextBlock Text="Логин:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
-                <TextBox x:Name="UserLogin" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
-
-            <TextBlock Text="Пароль:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,18" Background="White">
-                <PasswordBox x:Name="UserPass" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
-
-            <Button Content="✓ ВОЙТИ" Margin="0,0,0,10" Height="40"
-                    Background="#333" Foreground="White" FontWeight="Bold" FontSize="13"
-                    Click="LoginBtn_Click" Cursor="Hand">
-                <Button.Template>
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
-                                Background="{TemplateBinding Background}">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="12">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#555"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
-                </Button.Template>
-            </Button>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <Button Content="+ РЕГИСТРАЦИЯ" Height="40"
-                    Background="White" Foreground="#333" BorderBrush="#333" BorderThickness="2"
-                    FontWeight="Bold" FontSize="13"
-                    Click="OpenRegistrationBtn_Click" Cursor="Hand">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
-                                Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F0F0F0"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-        </StackPanel>
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#E9EEFF"/>
+            <Setter Property="Foreground" Value="#3553D8"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#DAE4FF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
-        <StackPanel x:Name="RegistrationPanel" VerticalAlignment="Center" Margin="30,20,30,20" Visibility="Collapsed">
-            <TextBlock Text="📝 РЕГИСТРАЦИЯ" HorizontalAlignment="Center"
-                       FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#333"/>
+    <Grid Margin="18">
+        <Border Background="White" CornerRadius="20" Padding="24" BorderBrush="#E3E9FB" BorderThickness="1">
+            <Grid>
+                <StackPanel x:Name="LoginPanel" VerticalAlignment="Center">
+                    <TextBlock Text="Вход" HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}"/>
+                    <TextBlock Text="Используйте логин и пароль аккаунта" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,24"/>
 
-            <TextBlock Text="Имя (Login):" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
-                <TextBox x:Name="RegName" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
+                    <TextBlock Text="Логин" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <TextBox x:Name="UserLogin" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
 
-            <TextBlock Text="Фамилия:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
-                <TextBox x:Name="RegLastName" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
+                    <TextBlock Text="Пароль" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}" Margin="0,0,0,18">
+                        <PasswordBox x:Name="UserPass" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
 
-            <TextBlock Text="Номер телефона:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,12" Background="White">
-                <TextBox x:Name="RegPhone" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
+                    <Button Content="Войти" Margin="0,0,0,10" Style="{StaticResource PrimaryButtonStyle}" Click="LoginBtn_Click"/>
+                    <Button Content="Создать аккаунт" Style="{StaticResource SecondaryButtonStyle}" Click="OpenRegistrationBtn_Click"/>
+                </StackPanel>
 
-            <TextBlock Text="Пароль:" Margin="0,0,0,6" FontSize="13" Foreground="#555" FontWeight="SemiBold"/>
-            <Border BorderBrush="#333" BorderThickness="2" CornerRadius="6" Margin="0,0,0,18" Background="White">
-                <PasswordBox x:Name="RegPass" Padding="10,8" BorderThickness="0" FontSize="13"/>
-            </Border>
+                <StackPanel x:Name="RegistrationPanel" VerticalAlignment="Center" Visibility="Collapsed">
+                    <TextBlock Text="Регистрация" HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}"/>
+                    <TextBlock Text="Заполните данные для нового аккаунта" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,20"/>
 
-            <Button Content="ЗАРЕГИСТРИРОВАТЬСЯ" Height="40" Margin="0,0,0,10"
-                    Background="#333" Foreground="White" FontWeight="Bold" FontSize="13"
-                    Click="RegBtn_Click" Cursor="Hand">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="2" BorderBrush="#333" CornerRadius="6"
-                                Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#555"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    <TextBlock Text="Имя (Login)" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <TextBox x:Name="RegName" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
 
-            <Button Content="← НАЗАД К ВХОДУ" Height="36"
-                    Background="White" Foreground="#333" BorderBrush="#333" BorderThickness="2"
-                    FontWeight="Bold" FontSize="12"
-                    Click="BackToLoginBtn_Click" Cursor="Hand"/>
-        </StackPanel>
+                    <TextBlock Text="Фамилия" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <TextBox x:Name="RegLastName" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
+
+                    <TextBlock Text="Номер телефона" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <TextBox x:Name="RegPhone" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
+
+                    <TextBlock Text="Пароль" Style="{StaticResource FieldLabelStyle}"/>
+                    <Border Style="{StaticResource InputBorderStyle}" Margin="0,0,0,16">
+                        <PasswordBox x:Name="RegPass" Padding="10,8" BorderThickness="0" FontSize="14" Background="Transparent"/>
+                    </Border>
+
+                    <Button Content="Зарегистрироваться" Margin="0,0,0,10" Style="{StaticResource PrimaryButtonStyle}" Click="RegBtn_Click"/>
+                    <Button Content="Назад ко входу" Style="{StaticResource SecondaryButtonStyle}" Click="BackToLoginBtn_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

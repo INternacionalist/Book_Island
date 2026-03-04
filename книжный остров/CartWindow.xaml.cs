@@ -54,14 +54,15 @@ namespace WpfAppBookStore
             }
         }
 
-        private void SelectAllCheckBox_Click(object sender, RoutedEventArgs e)
+        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
         {
-            bool shouldSelect = SelectAllCheckBox.IsChecked == true;
+            bool shouldSelect = CartSession.Items.Any(item => !item.IsSelected);
             foreach (CartItem item in CartSession.Items)
             {
                 item.IsSelected = shouldSelect;
             }
 
+            UpdateSelectAllState();
             UpdateTotal();
         }
 
@@ -137,12 +138,12 @@ namespace WpfAppBookStore
         {
             if (CartSession.Items.Count == 0)
             {
-                SelectAllCheckBox.IsChecked = false;
+                SelectAllButton.Content = "Выбрать все";
                 return;
             }
 
             bool areAllSelected = CartSession.Items.All(item => item.IsSelected);
-            SelectAllCheckBox.IsChecked = areAllSelected;
+            SelectAllButton.Content = areAllSelected ? "Снять все" : "Выбрать все";
         }
 
         private void UpdateTotal()
