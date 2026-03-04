@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -38,6 +39,7 @@ namespace WpfAppBookStore
             public string Author { get; set; } = "Неизвестный автор";
             public decimal Price { get; set; }
             public string Description { get; set; } = string.Empty;
+            public string SearchDescription => BuildSearchDescription(Description);
             public string Genre { get; set; } = "Без жанра";
             public int PublishYear { get; set; }
             public bool InStock { get; set; }
@@ -46,6 +48,7 @@ namespace WpfAppBookStore
             public double PopularityScore => (SalesCount * 0.5) + (CartAddsCount * 0.5);
             public ImageSource? CoverImage { get; set; }
             public bool IsInCart
+        
             {
                 get => isInCart;
                 set
@@ -56,6 +59,25 @@ namespace WpfAppBookStore
                 }
             }
             public event PropertyChangedEventHandler? PropertyChanged;
+
+            private static string BuildSearchDescription(string source)
+            {
+                if (string.IsNullOrWhiteSpace(source)) return string.Empty;
+                string[] words = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                return words.Length <= 10 ? source : string.Join(' ', words.Take(10)) + "...";
+            }
+
+            private bool isDescriptionExpanded;
+            public bool IsDescriptionExpanded
+            {
+                get => isDescriptionExpanded;
+                set
+                {
+                    if (isDescriptionExpanded == value) return;
+                    isDescriptionExpanded = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDescriptionExpanded)));
+                }
+            }
         }
 
         public class GenreGroup

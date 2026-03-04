@@ -1,27 +1,29 @@
 <Window x:Class="WpfAppBookStore.AddressDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Адрес доставки" Height="370" Width="560" WindowStartupLocation="CenterOwner">
-    <Grid Margin="14">
+        Title="Адрес доставки" Height="390" Width="560" WindowStartupLocation="CenterOwner" Background="#F2F6FF">
+    <Grid Margin="16">
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Border Background="White" CornerRadius="18" Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
 
-            <TextBox x:Name="CityBox" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Город"/>
-            <TextBox x:Name="DistrictBox" Grid.Column="1" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Район"/>
-            <TextBox x:Name="StreetBox" Grid.Row="1" Grid.ColumnSpan="2" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Улица"/>
-            <TextBox x:Name="HouseBox" Grid.Row="2" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Дом"/>
-            <TextBox x:Name="ApartmentBox" Grid.Row="2" Grid.Column="1" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Квартира (опционально)"/>
-            <TextBox x:Name="IntercomBox" Grid.Row="3" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Домофон (опционально)"/>
-            <TextBox x:Name="FloorBox" Grid.Row="3" Grid.Column="1" Margin="4" Height="30" VerticalContentAlignment="Center" ToolTip="Этаж (опционально)"/>
-            <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Margin="4,12,4,0" Foreground="#667085" Text="Поля: город, район, улица, дом — обязательные."/>
-        </Grid>
+                <TextBox x:Name="CityBox" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Город" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="DistrictBox" Grid.Column="1" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Район" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="StreetBox" Grid.Row="1" Grid.ColumnSpan="2" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Улица" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="HouseBox" Grid.Row="2" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Дом" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="ApartmentBox" Grid.Row="2" Grid.Column="1" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Квартира (опционально)" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="IntercomBox" Grid.Row="3" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Домофон (опционально)" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBox x:Name="FloorBox" Grid.Row="3" Grid.Column="1" Margin="4" Height="36" VerticalContentAlignment="Center" Text="Этаж (опционально)" GotFocus="Field_GotFocus" LostFocus="Field_LostFocus"/>
+                <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Margin="4,12,4,0" Foreground="#667085" Text="Обязательно: город, район, улица, дом."/>
+            </Grid>
+        </Border>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button Content="Отмена" Width="100" Margin="0,0,8,0" Click="Cancel_Click"/>
-            <Button Content="Оформить" Width="100" Click="Submit_Click"/>
+            <Button Content="ОК" Width="100" Click="Submit_Click"/>
         </StackPanel>
     </Grid>
 </Window>
