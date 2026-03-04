@@ -240,6 +240,51 @@ WHEN NOT MATCHED THEN
             cmd.ExecuteNonQuery();
         }
 
+
+        public static AddressInfo? GetUserAddress(int userId)
+        {
+            EnsureInfrastructure();
+            using SqlConnection conn = new(DatabaseConfig.ConnectionString);
+            conn.Open();
+            const string query = @"SELECT AddressCity, AddressDistrict, AddressStreet, AddressHouse, AddressApartment, AddressIntercom, AddressFloor
+                                   FROM dbo.читатели WHERE id=@uid";
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            using SqlDataReader reader = cmd.ExecuteReader();
+            if (!reader.Read() || reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2) || reader.IsDBNull(3)) return null;
+            return new AddressInfo
+            {
+                City = reader[0]?.ToString() ?? string.Empty,
+                District = reader[1]?.ToString() ?? string.Empty,
+                Street = reader[2]?.ToString() ?? string.Empty,
+                House = reader[3]?.ToString() ?? string.Empty,
+                Apartment = reader[4]?.ToString() ?? string.Empty,
+                Intercom = reader[5]?.ToString() ?? string.Empty,
+                Floor = reader[6]?.ToString() ?? string.Empty
+            };
+        }
+
+        public static void SaveUserAddress(int userId, AddressInfo address)
+        {
+            EnsureInfrastructure();
+            using SqlConnection conn = new(DatabaseConfig.ConnectionString);
+            conn.Open();
+            const string updateAddress = @"UPDATE dbo.читатели
+                                           SET AddressCity=@city, AddressDistrict=@district, AddressStreet=@street,
+                                               AddressHouse=@house, AddressApartment=@apartment, AddressIntercom=@intercom, AddressFloor=@floor
+                                           WHERE id=@uid";
+            using SqlCommand cmd = new(updateAddress, conn);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            cmd.Parameters.AddWithValue("@city", address.City);
+            cmd.Parameters.AddWithValue("@district", address.District);
+            cmd.Parameters.AddWithValue("@street", address.Street);
+            cmd.Parameters.AddWithValue("@house", address.House);
+            cmd.Parameters.AddWithValue("@apartment", string.IsNullOrWhiteSpace(address.Apartment) ? DBNull.Value : address.Apartment);
+            cmd.Parameters.AddWithValue("@intercom", string.IsNullOrWhiteSpace(address.Intercom) ? DBNull.Value : address.Intercom);
+            cmd.Parameters.AddWithValue("@floor", string.IsNullOrWhiteSpace(address.Floor) ? DBNull.Value : address.Floor);
+            cmd.ExecuteNonQuery();
+        }
+
         public static int CreateOrder(int userId, AddressInfo address, List<CartItem> selectedItems)
         {
             EnsureInfrastructure();

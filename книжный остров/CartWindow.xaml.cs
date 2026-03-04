@@ -124,10 +124,18 @@ namespace WpfAppBookStore
                     return;
                 }
 
-                AddressDialog dialog = new() { Owner = this };
-                if (dialog.ShowDialog() != true || dialog.Address == null) return;
+                AddressInfo? savedAddress = DatabaseService.GetUserAddress(UserSession.UserId);
+                AddressInfo? addressToUse = savedAddress;
 
-                int orderId = DatabaseService.CreateOrder(UserSession.UserId, dialog.Address, selected);
+                if (addressToUse == null)
+                {
+                    AddressDialog dialog = new() { Owner = this };
+                    if (dialog.ShowDialog() != true || dialog.Address == null) return;
+                    addressToUse = dialog.Address;
+                    DatabaseService.SaveUserAddress(UserSession.UserId, addressToUse);
+                }
+
+                int orderId = DatabaseService.CreateOrder(UserSession.UserId, addressToUse, selected);
 
                 foreach (var item in selected.ToList())
                 {

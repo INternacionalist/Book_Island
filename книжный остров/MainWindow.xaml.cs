@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -38,6 +39,7 @@ namespace WpfAppBookStore
             public string Author { get; set; } = "Неизвестный автор";
             public decimal Price { get; set; }
             public string Description { get; set; } = string.Empty;
+            public string SearchDescription => BuildSearchDescription(Description);
             public string Genre { get; set; } = "Без жанра";
             public int PublishYear { get; set; }
             public bool InStock { get; set; }
@@ -56,6 +58,13 @@ namespace WpfAppBookStore
                 }
             }
             public event PropertyChangedEventHandler? PropertyChanged;
+
+            private static string BuildSearchDescription(string source)
+            {
+                if (string.IsNullOrWhiteSpace(source)) return string.Empty;
+                string[] words = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                return words.Length <= 10 ? source : string.Join(' ', words.Take(10)) + "...";
+            }
         }
 
         public class GenreGroup
@@ -224,6 +233,13 @@ namespace WpfAppBookStore
         private void OpenAllBooksButton_Click(object sender, RoutedEventArgs e)
         {
             new AllBooksWindow(allBooks) { Owner = this }.ShowDialog();
+        }
+
+        private void BookDescription_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not TextBlock { DataContext: Book book }) return;
+            MessageBox.Show(book.Description, book.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            e.Handled = true;
         }
     }
 }

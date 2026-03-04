@@ -1,4 +1,3 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,17 +24,8 @@ namespace WpfAppBookStore
             if (UserSession.UserId <= 0) return "—";
             try
             {
-                using SqlConnection conn = new(DatabaseConfig.ConnectionString);
-                conn.Open();
-                const string q = @"SELECT AddressCity, AddressDistrict, AddressStreet, AddressHouse, AddressApartment
-                                   FROM dbo.читатели WHERE id=@id";
-                using SqlCommand cmd = new(q, conn);
-                cmd.Parameters.AddWithValue("@id", UserSession.UserId);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.Read()) return "—";
-                if (reader.IsDBNull(0)) return "—";
-                string apt = reader[4]?.ToString() ?? string.Empty;
-                return $"{reader[0]}, {reader[1]}, {reader[2]}, д. {reader[3]}" + (string.IsNullOrWhiteSpace(apt) ? string.Empty : $", кв. {apt}");
+                AddressInfo? address = DatabaseService.GetUserAddress(UserSession.UserId);
+                return address == null ? "—" : address.AsSingleLine();
             }
             catch (Exception ex)
             {
@@ -44,6 +34,24 @@ namespace WpfAppBookStore
             }
         }
 
+
+        private void AddressCard_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (UserSession.UserId <= 0) return;
+            try
+            {
+                AddressDialog dialog = new(DatabaseService.GetUserAddress(UserSession.UserId)) { Owner = this };
+                if (dialog.ShowDialog() != true || dialog.Address == null) return;
+                DatabaseService.SaveUserAddress(UserSession.UserId, dialog.Address);
+                AddressText.Text = dialog.Address.AsSingleLine();
+                new SuccessDialog("Адрес обновлен").ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.LogError("ProfileWindow.AddressCard_MouseDoubleClick", ex);
+            }
+            e.Handled = true;
+        }
         private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
         private void CopyCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

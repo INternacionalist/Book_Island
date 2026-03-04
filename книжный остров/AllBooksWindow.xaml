@@ -1,17 +1,160 @@
 <Window x:Class="WpfAppBookStore.AllBooksWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Все книги" Height="600" Width="980" WindowStartupLocation="CenterOwner">
-    <DockPanel Margin="12">
-        <TextBox x:Name="SearchBox" Height="32" Margin="0,0,0,10" DockPanel.Dock="Top" TextChanged="SearchBox_TextChanged" ToolTip="Поиск по названию"/>
-        <DataGrid x:Name="BooksGrid" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding BookID}" Width="70"/>
-                <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*"/>
-                <DataGridTextColumn Header="Автор" Binding="{Binding Author}" Width="220"/>
-                <DataGridTextColumn Header="Жанр" Binding="{Binding Genre}" Width="140"/>
-                <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat={}{0:N0} ₽}" Width="120"/>
-            </DataGrid.Columns>
-        </DataGrid>
-    </DockPanel>
+        Title="Все книги" Height="800" Width="1320"
+        WindowStartupLocation="CenterOwner"
+        Background="#F2F6FF">
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#4B6BFB"/>
+        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#3553D8"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextMainBrush" Color="#182033"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#65708A"/>
+
+        <Style x:Key="HeaderActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="14" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BookCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,0,16,16"/>
+            <Setter Property="Width" Value="220"/>
+            <Setter Property="Height" Value="400"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="14" ShadowDepth="4" Opacity="0.16" Color="#2A3D78"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BuyButtonStyle" TargetType="Button">
+            <Setter Property="Content" Value="Купить"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=DataContext.IsInCart}" Value="True">
+                    <Setter Property="Content" Value="В корзине"/>
+                    <Setter Property="Background" Value="#00A651"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D6DCF2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="14" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border CornerRadius="20" Background="White" Padding="16" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="SearchBox" Grid.Column="0" Style="{StaticResource SearchTextBoxStyle}" TextChanged="SearchBox_TextChanged" ToolTip="Поиск"/>
+                <Button Grid.Column="1" Width="120" Margin="12,0,0,0" Style="{StaticResource HeaderActionButtonStyle}" Content="Купить все" Click="BuyAllButton_Click"/>
+                <Button Grid.Column="2" Width="100" Margin="12,0,0,0" Style="{StaticResource HeaderActionButtonStyle}" Content="Закрыть" Click="Close_Click"/>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="BooksItemsControl">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel ItemWidth="220"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource BookCardStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="220"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" CornerRadius="12" Background="#EEF2FF">
+                                    <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                                </Border>
+                                <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
+                                    <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Cursor="Hand" MouseLeftButtonUp="DescriptionTextBlock_MouseLeftButtonUp"/>
+                                    <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}">
+                                            <Run Text="{Binding Price}"/><Run Text=" ₽"/>
+                                        </TextBlock>
+                                        <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Click="BuyButton_Click"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
 </Window>
