@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("книжный остров")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0b6e313910b9c07c9e78204725d4efab44c0c19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4525f3340e3a4788ad2ceb34a458b4494b473441")]
 [assembly: System.Reflection.AssemblyProductAttribute("книжный остров")]
 [assembly: System.Reflection.AssemblyTitleAttribute("книжный остров")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

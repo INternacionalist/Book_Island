@@ -11,12 +11,13 @@ namespace WpfAppBookStore
 {
     public partial class LoginWindow : Window
     {
-        private string connStr = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
+        private string connStr = DatabaseConfig.ConnectionString;
         private static readonly HttpClient HttpClient = new();
 
         public LoginWindow()
         {
             InitializeComponent();
+            try { DatabaseService.EnsureInfrastructure(); } catch (Exception ex) { DbLogger.LogError("LoginWindow.ctor", ex); }
         }
 
         private void OpenRegistrationBtn_Click(object sender, RoutedEventArgs e)
@@ -43,6 +44,17 @@ namespace WpfAppBookStore
             {
                 new ErrorDialog("Введите логин и пароль!").ShowDialog();
                 UserLogin.Background = new SolidColorBrush(Color.FromRgb(255, 200, 200));
+                return;
+            }
+
+            // Спец-вход в админ-панель по заранее заданным данным.
+            if (string.Equals(login, "джефри", StringComparison.OrdinalIgnoreCase) && pass == "эпштейн")
+            {
+                new SuccessDialog("Выполнен вход администратора").ShowDialog();
+                string now = DateTime.Now.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+                UserSession.Login("джефри", "Администратор", string.Empty, -1, now, true);
+                DialogResult = true;
+                Close();
                 return;
             }
 

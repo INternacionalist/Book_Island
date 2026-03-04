@@ -1,12 +1,9 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -14,21 +11,28 @@ namespace WpfAppBookStore
 {
     public partial class MainWindow : Window
     {
-        private readonly string connectionString = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
         private readonly List<Book> allBooks = new();
 
         public MainWindow()
         {
             InitializeComponent();
-            UpdateProfileButton();
-            LoadBooks();
-            CartSession.Items.CollectionChanged += (_, _) => RefreshBooksCartState();
+            try
+            {
+                DatabaseService.EnsureInfrastructure();
+                LoadBooks();
+                UpdateProfileButton();
+                UpdateRoleButtons();
+                CartSession.Items.CollectionChanged += (_, _) => RefreshBooksCartState();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.LogError("MainWindow.ctor", ex);
+            }
         }
 
         public class Book : INotifyPropertyChanged
         {
             private bool isInCart;
-
             public int BookID { get; set; }
             public string Title { get; set; } = string.Empty;
             public string Author { get; set; } = "Неизвестный автор";
@@ -37,23 +41,20 @@ namespace WpfAppBookStore
             public string Genre { get; set; } = "Без жанра";
             public int PublishYear { get; set; }
             public bool InStock { get; set; }
+            public int SalesCount { get; set; }
+            public int CartAddsCount { get; set; }
+            public double PopularityScore => (SalesCount * 0.5) + (CartAddsCount * 0.5);
             public ImageSource? CoverImage { get; set; }
-
             public bool IsInCart
             {
                 get => isInCart;
                 set
                 {
-                    if (isInCart == value)
-                    {
-                        return;
-                    }
-
+                    if (isInCart == value) return;
                     isInCart = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsInCart)));
                 }
             }
-
             public event PropertyChangedEventHandler? PropertyChanged;
         }
 
@@ -65,179 +66,103 @@ namespace WpfAppBookStore
 
         private void LoadBooks()
         {
-            allBooks.Clear();
-
             try
             {
-                using SqlConnection conn = new(connectionString);
-                conn.Open();
+                allBooks.Clear();
+                allBooks.AddRange(DatabaseService.LoadBooks());
 
-                bool hasCoverImageColumn = HasColumn(conn, "dbo", "Books", "CoverImage");
-                string coverImageSelect = hasCoverImageColumn
-                    ? "b.CoverImage"
-                    : "CAST(NULL AS varbinary(max)) AS CoverImage";
-
-                string query = $@"SELECT b.BookID, b.Title, b.Author, b.Price, b.Description, b.Genre, b.PublishYear, b.InStock,
-                                         {coverImageSelect}
-                                  FROM dbo.Books b
-                                  WHERE b.InStock = 1";
-
-                using SqlCommand cmd = new(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                int bookIdOrdinal = reader.GetOrdinal("BookID");
-                int titleOrdinal = reader.GetOrdinal("Title");
-                int authorOrdinal = reader.GetOrdinal("Author");
-                int priceOrdinal = reader.GetOrdinal("Price");
-                int descriptionOrdinal = reader.GetOrdinal("Description");
-                int genreOrdinal = reader.GetOrdinal("Genre");
-                int publishYearOrdinal = reader.GetOrdinal("PublishYear");
-                int inStockOrdinal = reader.GetOrdinal("InStock");
-                int coverImageOrdinal = reader.GetOrdinal("CoverImage");
-
-                while (reader.Read())
+                if (UserSession.UserId > 0)
                 {
-                    allBooks.Add(new Book
-                    {
-                        BookID = reader.GetInt32(bookIdOrdinal),
-                        Title = reader.IsDBNull(titleOrdinal) ? "Без названия" : reader.GetString(titleOrdinal),
-                        Author = reader.IsDBNull(authorOrdinal) ? "Неизвестный автор" : reader.GetString(authorOrdinal),
-                        Price = reader.IsDBNull(priceOrdinal) ? 0 : reader.GetDecimal(priceOrdinal),
-                        Description = reader.IsDBNull(descriptionOrdinal) ? string.Empty : reader.GetString(descriptionOrdinal),
-                        CoverImage = reader.IsDBNull(coverImageOrdinal) ? BuildPlaceholderImage() : BuildImage((byte[])reader[coverImageOrdinal]),
-                        Genre = reader.IsDBNull(genreOrdinal) ? "Без жанра" : reader.GetString(genreOrdinal),
-                        PublishYear = reader.IsDBNull(publishYearOrdinal) ? 0 : reader.GetInt32(publishYearOrdinal),
-                        InStock = reader.GetBoolean(inStockOrdinal),
-                        IsInCart = CartSession.ContainsBook(reader.GetInt32(bookIdOrdinal))
-                    });
+                    CartSession.LoadForUser(UserSession.UserId, allBooks);
                 }
 
                 BindSections();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки книг:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                DbLogger.LogError("MainWindow.LoadBooks", ex);
             }
-        }
-
-        private static bool HasColumn(SqlConnection connection, string schemaName, string tableName, string columnName)
-        {
-            const string query = @"SELECT COUNT(1)
-                                   FROM INFORMATION_SCHEMA.COLUMNS
-                                   WHERE TABLE_SCHEMA = @schemaName
-                                     AND TABLE_NAME = @tableName
-                                     AND COLUMN_NAME = @columnName";
-
-            using SqlCommand cmd = new(query, connection);
-            cmd.Parameters.AddWithValue("@schemaName", schemaName);
-            cmd.Parameters.AddWithValue("@tableName", tableName);
-            cmd.Parameters.AddWithValue("@columnName", columnName);
-
-            object? result = cmd.ExecuteScalar();
-            return result is int count && count > 0;
         }
 
         private void BindSections()
         {
-            var popularStub = allBooks.Take(8).ToList();
-            PopularBooksItemsControl.ItemsSource = popularStub;
-
-            var genreGroups = allBooks
+            PopularBooksItemsControl.ItemsSource = allBooks.Take(5).ToList();
+            TopBooksItemsControl.ItemsSource = allBooks.OrderByDescending(b => b.PopularityScore).Take(10).ToList();
+            GenresItemsControl.ItemsSource = allBooks
                 .GroupBy(b => b.Genre)
-                .Take(4)
-                .Select(group => new GenreGroup
-                {
-                    GenreName = group.Key,
-                    Books = group.Take(6).ToList()
-                })
+                .Select(group => new GenreGroup { GenreName = group.Key, Books = group.Take(6).ToList() })
                 .ToList();
-
-            GenresItemsControl.ItemsSource = genreGroups;
         }
 
-        private static BitmapImage BuildImage(byte[] bytes)
+        public static BitmapImage BuildPlaceholderImage()
         {
-            using MemoryStream ms = new(bytes);
-            BitmapImage image = new();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.StreamSource = ms;
-            image.EndInit();
-            image.Freeze();
-            return image;
-        }
-
-        private static BitmapImage BuildPlaceholderImage()
-        {
-            byte[] imageBytes = Convert.FromBase64String(
-                "iVBORw0KGgoAAAANSUhEUgAAAEAAAABQCAIAAAD6xG44AAAAiElEQVR4nO3PQQ3AIBDAsAP/nkEEj4ZkVbDX1pk5M+/w5wBnGdAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNBW5wFB7fN6mQAAAABJRU5ErkJggg==");
-            return BuildImage(imageBytes);
+            byte[] imageBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAEAAAABQCAIAAAD6xG44AAAAiElEQVR4nO3PQQ3AIBDAsAP/nkEEj4ZkVbDX1pk5M+/w5wBnGdAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNAyQMsALQO0DNBW5wFB7fN6mQAAAABJRU5ErkJggg==");
+            return DatabaseService.BuildImage(imageBytes);
         }
 
         private void BuyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button { DataContext: Book selectedBook })
+            try
             {
-                return;
+                if (sender is not Button { DataContext: Book selectedBook }) return;
+                if (selectedBook.IsInCart) { OpenCartWindow(); return; }
+                CartSession.AddBook(selectedBook);
+                selectedBook.IsInCart = true;
             }
-
-            if (selectedBook.IsInCart)
-            {
-                OpenCartWindow();
-                return;
-            }
-
-            CartSession.AddBook(selectedBook);
-            selectedBook.IsInCart = true;
+            catch (Exception ex) { DbLogger.LogError("MainWindow.BuyButton_Click", ex); }
         }
 
-        private void CartButton_Click(object sender, RoutedEventArgs e)
-        {
-            OpenCartWindow();
-        }
+        private void CartButton_Click(object sender, RoutedEventArgs e) => OpenCartWindow();
 
         private void OpenCartWindow()
         {
-            CartWindow cartWindow = new()
-            {
-                Owner = this
-            };
+            CartWindow cartWindow = new() { Owner = this };
             cartWindow.ShowDialog();
             RefreshBooksCartState();
+            UpdateRoleButtons();
         }
 
         private void ProfileButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!UserSession.IsAuthenticated)
+            try
             {
-                LoginWindow loginWindow = new()
+                if (!UserSession.IsAuthenticated)
                 {
-                    Owner = this
-                };
-
-                bool? dialogResult = loginWindow.ShowDialog();
-                if (dialogResult == true)
-                {
-                    UpdateProfileButton();
+                    LoginWindow loginWindow = new() { Owner = this };
+                    if (loginWindow.ShowDialog() == true)
+                    {
+                        LoadBooks();
+                        UpdateProfileButton();
+                        UpdateRoleButtons();
+                        if (UserSession.IsAdmin)
+                        {
+                            new AdminWindow { Owner = this }.ShowDialog();
+                            LoadBooks();
+                        }
+                    }
+                    return;
                 }
 
-                return;
+                new ProfileWindow { Owner = this }.ShowDialog();
             }
-
-            ProfileWindow profileWindow = new()
-            {
-                Owner = this
-            };
-            profileWindow.ShowDialog();
+            catch (Exception ex) { DbLogger.LogError("MainWindow.ProfileButton_Click", ex); }
         }
 
         private void UpdateProfileButton()
         {
-            ProfileButton.Content = UserSession.IsAuthenticated
-                ? $"👤 {UserSession.UserName}"
-                : "👤 Логин";
+            ProfileButton.Content = UserSession.IsAuthenticated ? $"👤 {UserSession.UserName}" : "👤 Логин";
         }
 
+        private void UpdateRoleButtons()
+        {
+            try
+            {
+                AdminButton.Visibility = UserSession.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+                bool hasOrders = UserSession.UserId > 0 && DatabaseService.GetOrdersByUser(UserSession.UserId).Count > 0;
+                OrderHistoryButton.Visibility = hasOrders ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch (Exception ex) { DbLogger.LogError("MainWindow.UpdateRoleButtons", ex); }
+        }
 
         private void RefreshBooksCartState()
         {
@@ -249,21 +174,20 @@ namespace WpfAppBookStore
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string query = SearchBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(query))
+            try
             {
-                SearchSuggestionsPopup.IsOpen = false;
-                SearchSuggestionsList.ItemsSource = null;
-                return;
+                string query = SearchBox.Text.Trim();
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    SearchSuggestionsPopup.IsOpen = false;
+                    SearchSuggestionsList.ItemsSource = null;
+                    return;
+                }
+                List<Book> matches = allBooks.Where(book => book.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).Take(7).ToList();
+                SearchSuggestionsList.ItemsSource = matches;
+                SearchSuggestionsPopup.IsOpen = matches.Count > 0;
             }
-
-            List<Book> matches = allBooks
-                .Where(book => book.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .Take(7)
-                .ToList();
-
-            SearchSuggestionsList.ItemsSource = matches;
-            SearchSuggestionsPopup.IsOpen = matches.Count > 0;
+            catch (Exception ex) { DbLogger.LogError("MainWindow.SearchBox_TextChanged", ex); }
         }
 
         private void SearchSuggestionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -283,6 +207,23 @@ namespace WpfAppBookStore
                 MessageBox.Show($"Открываем карточку книги: {selected.Title}", "Поиск", MessageBoxButton.OK, MessageBoxImage.Information);
                 SearchSuggestionsPopup.IsOpen = false;
             }
+        }
+
+        private void OrderHistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            new OrderHistoryWindow { Owner = this }.ShowDialog();
+            UpdateRoleButtons();
+        }
+
+        private void AdminButton_Click(object sender, RoutedEventArgs e)
+        {
+            new AdminWindow { Owner = this }.ShowDialog();
+            LoadBooks();
+        }
+
+        private void OpenAllBooksButton_Click(object sender, RoutedEventArgs e)
+        {
+            new AllBooksWindow(allBooks) { Owner = this }.ShowDialog();
         }
     }
 }
