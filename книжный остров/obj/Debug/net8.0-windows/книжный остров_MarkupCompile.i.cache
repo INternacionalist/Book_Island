@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\Desfor\source\repos\Book_Island\книжный остров\App.xaml
-41956488289
+10607769742
 
-9-1530442646
+201877864567
 229429761168
-ErrorDialog.xaml;LoginWindow.xaml;MainWindow.xaml;SuccessDialog.xaml;
+AddressDialog.xaml;AdminWindow.xaml;AllBooksWindow.xaml;CartWindow.xaml;ErrorDialog.xaml;LoginWindow.xaml;MainWindow.xaml;OrderHistoryWindow.xaml;ProfileWindow.xaml;SuccessDialog.xaml;
 
 False
 

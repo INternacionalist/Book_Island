@@ -18,7 +18,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
                         <Grid Width="26" Height="26">
-                            <Border x:Name="SelectionBorder" Background="#F4F6FF" BorderBrush="#D0D8F5" BorderThickness="1.5" CornerRadius="13"/>
+                            <Border x:Name="SelectionBorder" Background="#F4F6FF" BorderBrush="#D0D8F5" BorderThickness="1.5" CornerRadius="4"/>
                             <TextBlock x:Name="SelectionIcon" Text="✓" FontSize="14" FontWeight="Bold" Foreground="#A3AED0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -115,7 +115,7 @@
 
                     <Border Background="#EDF1F8" CornerRadius="12" Padding="14" Margin="0,0,0,12">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="30" Height="30" CornerRadius="15" Background="#DDE7FF" Margin="0,0,10,0">
+                            <Border Width="30" Height="30" CornerRadius="4" Background="#DDE7FF" Margin="0,0,10,0">
                                 <TextBlock Text="✓" FontWeight="Bold" Foreground="#3553D8" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <TextBlock Text="Доступны для заказа" FontWeight="SemiBold" Foreground="#1D2939" FontSize="22" VerticalAlignment="Center"/>

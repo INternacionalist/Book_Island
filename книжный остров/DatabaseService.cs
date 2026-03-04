@@ -40,16 +40,16 @@ namespace WpfAppBookStore
     {
         private static bool isEnsured;
 
+        public static void ResetEnsured() => isEnsured = false;
+
         public static void EnsureInfrastructure()
         {
-            if (isEnsured)
-            {
-                return;
-            }
+            if (isEnsured) return;
 
             using SqlConnection conn = new(DatabaseConfig.ConnectionString);
             conn.Open();
 
+            // Основной скрипт — таблицы и колонки Books
             string script = @"
 IF OBJECT_ID('dbo.CartItems','U') IS NULL
 BEGIN
@@ -109,30 +109,20 @@ BEGIN
 END;
 
 IF COL_LENGTH('dbo.Books','CoverImage') IS NULL
-BEGIN
     ALTER TABLE dbo.Books ADD CoverImage VARBINARY(MAX) NULL;
-END;
 
 IF COL_LENGTH('dbo.Books','SalesCount') IS NULL
-BEGIN
     ALTER TABLE dbo.Books ADD SalesCount INT NOT NULL CONSTRAINT DF_Books_SalesCount DEFAULT(0);
-END;
 
 IF COL_LENGTH('dbo.Books','CartAddsCount') IS NULL
-BEGIN
     ALTER TABLE dbo.Books ADD CartAddsCount INT NOT NULL CONSTRAINT DF_Books_CartAddsCount DEFAULT(0);
-END;
-
-IF COL_LENGTH('dbo.читатели','AddressCity') IS NULL
-BEGIN
-    ALTER TABLE dbo.читатели ADD AddressCity NVARCHAR(120) NULL, AddressDistrict NVARCHAR(120) NULL,
-        AddressStreet NVARCHAR(120) NULL, AddressHouse NVARCHAR(30) NULL, AddressApartment NVARCHAR(30) NULL,
-        AddressIntercom NVARCHAR(30) NULL, AddressFloor NVARCHAR(30) NULL;
-END;
 ";
+            using (SqlCommand scriptCmd = new(script, conn))
+                scriptCmd.ExecuteNonQuery();
 
-            using SqlCommand cmd = new(script, conn);
-            cmd.ExecuteNonQuery();
+            // Адресные колонки — каждая отдельной командой, чтобы не падало если часть уже есть
+           
+
             isEnsured = true;
         }
 
@@ -190,10 +180,7 @@ END;
             {
                 int bookId = reader.GetInt32(0);
                 MainWindow.Book? book = books.FirstOrDefault(b => b.BookID == bookId);
-                if (book == null)
-                {
-                    continue;
-                }
+                if (book == null) continue;
 
                 items.Add(new CartItem
                 {
@@ -335,7 +322,8 @@ WHEN NOT MATCHED THEN
                     TotalAmount = reader.GetDecimal(1),
                     Status = reader["Status"]?.ToString() ?? "Ожидается",
                     CreatedAt = reader.GetDateTime(3),
-                    AddressLine = $"{reader["City"]}, {reader["District"]}, {reader["Street"]}, д. {reader["House"]}" + (string.IsNullOrWhiteSpace(apt) ? string.Empty : $", кв. {apt}")
+                    AddressLine = $"{reader["City"]}, {reader["District"]}, {reader["Street"]}, д. {reader["House"]}" +
+                                  (string.IsNullOrWhiteSpace(apt) ? string.Empty : $", кв. {apt}")
                 });
             }
             return result;
