@@ -41,8 +41,9 @@
                     </StackPanel>
                 </Border>
 
-                <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,18" Cursor="Hand" MouseDoubleClick="AddressCard_MouseDoubleClick" Tag="AddressText">
-                    <StackPanel>
+                    <Border Background="#EAF0FF" CornerRadius="14" Padding="16" Margin="0,0,0,18" 
+        Cursor="Hand" MouseLeftButtonUp="AddressCard_MouseLeftButtonUp" Tag="AddressText">
+                        <StackPanel>
                         <TextBlock Text="Адрес доставки" FontSize="13" Foreground="#64729A"/>
                         <TextBlock x:Name="AddressText" FontSize="16" FontWeight="SemiBold" Foreground="#1A2550" TextWrapping="Wrap"/>
                     </StackPanel>

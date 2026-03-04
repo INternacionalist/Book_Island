@@ -95,18 +95,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Border Background="#F9FAFD" CornerRadius="20" Padding="18,14" BorderBrush="#E8ECF4" BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="SelectAllButton" Content="Выбрать все" Style="{StaticResource SelectAllButtonStyle}" VerticalAlignment="Center" Click="SelectAllButton_Click"/>
-                <TextBlock Grid.Column="1" Text="🛒" FontSize="24" VerticalAlignment="Center"/>
-            </Grid>
-        </Border>
+            <Border Background="#F9FAFD" CornerRadius="20" Padding="18,14" BorderBrush="#E8ECF4" BorderThickness="1">
+                <TextBlock Text="🛒 Корзина" FontSize="22" FontWeight="Bold" Foreground="#1D2939" VerticalAlignment="Center"/>
+            </Border>
 
-        <Border Grid.Row="1" Margin="0,14,0,14" Background="#FBFCFE" CornerRadius="20" BorderBrush="#E8ECF4" BorderThickness="1" Padding="14">
+            <Border Grid.Row="1" Margin="0,14,0,14" Background="#FBFCFE" CornerRadius="20" BorderBrush="#E8ECF4" BorderThickness="1" Padding="14">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -114,15 +107,13 @@
                 </Grid.RowDefinitions>
 
                     <Border Background="#EDF1F8" CornerRadius="12" Padding="14" Margin="0,0,0,12">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="30" Height="30" CornerRadius="4" Background="#DDE7FF" Margin="0,0,10,0">
-                                <TextBlock Text="✓" FontWeight="Bold" Foreground="#3553D8" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <TextBlock Text="Доступны для заказа" FontWeight="SemiBold" Foreground="#1D2939" FontSize="22" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <Button x:Name="SelectAllButton" Content="Выбрать все" 
+            Style="{StaticResource SelectAllButtonStyle}" 
+            HorizontalAlignment="Stretch"
+            Click="SelectAllButton_Click"/>
                     </Border>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" PanningMode="VerticalOnly">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" PanningMode="VerticalOnly">
                     <ItemsControl x:Name="CartItemsControl">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

@@ -48,6 +48,7 @@ namespace WpfAppBookStore
             public double PopularityScore => (SalesCount * 0.5) + (CartAddsCount * 0.5);
             public ImageSource? CoverImage { get; set; }
             public bool IsInCart
+        
             {
                 get => isInCart;
                 set
@@ -64,6 +65,18 @@ namespace WpfAppBookStore
                 if (string.IsNullOrWhiteSpace(source)) return string.Empty;
                 string[] words = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 return words.Length <= 10 ? source : string.Join(' ', words.Take(10)) + "...";
+            }
+
+            private bool isDescriptionExpanded;
+            public bool IsDescriptionExpanded
+            {
+                get => isDescriptionExpanded;
+                set
+                {
+                    if (isDescriptionExpanded == value) return;
+                    isDescriptionExpanded = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDescriptionExpanded)));
+                }
             }
         }
 
@@ -233,13 +246,6 @@ namespace WpfAppBookStore
         private void OpenAllBooksButton_Click(object sender, RoutedEventArgs e)
         {
             new AllBooksWindow(allBooks) { Owner = this }.ShowDialog();
-        }
-
-        private void BookDescription_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is not TextBlock { DataContext: Book book }) return;
-            MessageBox.Show(book.Description, book.Title, MessageBoxButton.OK, MessageBoxImage.Information);
-            e.Handled = true;
         }
     }
 }

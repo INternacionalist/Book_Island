@@ -18,6 +18,9 @@ namespace WpfAppBookStore
             source = books;
             filtered = source.ToList();
             BooksItemsControl.ItemsSource = filtered;
+
+            // Подписка на событие вместо переопределения метода OnPreviewMouseDown.
+            PreviewMouseDown += AllBooksWindow_PreviewMouseDown;
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -51,10 +54,20 @@ namespace WpfAppBookStore
             }
         }
 
+        // Новый обработчик события PreviewMouseDown вместо override.
+        private void AllBooksWindow_PreviewMouseDown(object? sender, MouseButtonEventArgs e)
+        {
+            if (BooksItemsControl.ItemsSource is IEnumerable<MainWindow.Book> books)
+            {
+                foreach (MainWindow.Book b in books)
+                    b.IsDescriptionExpanded = false;
+            }
+        }
+
         private void DescriptionTextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is not TextBlock { DataContext: MainWindow.Book book }) return;
-            MessageBox.Show(book.Description, book.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            book.IsDescriptionExpanded = true;
             e.Handled = true;
         }
 

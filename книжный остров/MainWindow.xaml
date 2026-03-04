@@ -88,31 +88,34 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="ButtonRoot" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            </Border.RenderTransform>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsInCart}" Value="True">
+                                <Setter Property="Content" Value="В корзине"/>
+                                <Setter Property="Background" Value="#00A651"/>
+                                <Setter Property="Padding" Value="16,8"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ButtonRoot" Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" From="0.92" To="1" Duration="0:0:0.18"/>
+                                            <DoubleAnimation Storyboard.TargetName="ButtonRoot" Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" From="0.92" To="1" Duration="0:0:0.18"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
-                </Trigger>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=DataContext.IsInCart}" Value="True">
-                    <Setter Property="Content" Value="В корзине"/>
-                    <Setter Property="Background" Value="#00A651"/>
-                    <Setter Property="Padding" Value="16,8"/>
-                    <Setter Property="FontSize" Value="13"/>
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" From="0.92" To="1" Duration="0:0:0.18"/>
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" From="0.92" To="1" Duration="0:0:0.18"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
     </Window.Resources>
 
@@ -199,12 +202,9 @@
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="📚 Все книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
-                <TextBlock Text="Показываем 5 книг. Нажмите «Смотреть все», чтобы открыть полный каталог." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
-
-                <DockPanel Margin="0,0,0,12">
-                    <TextBlock Text="" DockPanel.Dock="Left"/>
-                    <Button Content="Смотреть все →" DockPanel.Dock="Right" Style="{StaticResource HeaderActionButtonStyle}" Width="170" Height="38" Click="OpenAllBooksButton_Click"/>
+                <DockPanel Margin="4,0,0,16">
+                    <TextBlock Text="📚 Все книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+                    <Button Content="Смотреть все →" HorizontalAlignment="Right" DockPanel.Dock="Right" Style="{StaticResource HeaderActionButtonStyle}" Width="170" Height="38" Click="OpenAllBooksButton_Click"/>
                 </DockPanel>
 
                 <ItemsControl x:Name="PopularBooksItemsControl" Margin="0,0,0,24">
@@ -226,7 +226,15 @@
                                     </Border>
                                     <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
-                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Cursor="Hand" MouseLeftButtonUp="BookDescription_MouseLeftButtonUp"/>
+                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Cursor="Hand">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <Border Background="#F8FAFF" BorderBrush="#CFD8F6" BorderThickness="1" CornerRadius="12" Padding="14" Width="300">
+                                                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#344054" FontSize="14"/>
+                                                    </Border>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
                                         <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -247,18 +255,42 @@
 
                 <TextBlock Text="🔥 Популярные книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
                 <ItemsControl x:Name="TopBooksItemsControl" Margin="0,0,0,24">
-                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource BookCardStyle}">
-                                <Grid><Grid.RowDefinitions><RowDefinition Height="220"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                                    <Border Grid.Row="0" CornerRadius="12" Background="#EEF2FF"><Image Source="{Binding CoverImage}" Stretch="UniformToFill"/></Border>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="220"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" CornerRadius="12" Background="#EEF2FF">
+                                        <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                                    </Border>
                                     <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
-                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Cursor="Hand" MouseLeftButtonUp="BookDescription_MouseLeftButtonUp"/>
+                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Cursor="Hand">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <Border Background="#F8FAFF" BorderBrush="#CFD8F6" BorderThickness="1" CornerRadius="12" Padding="14" Width="300">
+                                                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#344054" FontSize="14"/>
+                                                    </Border>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
                                         <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
-                                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                            <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"><Run Text="{Binding Price}"/><Run Text=" ₽"/></TextBlock>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}">
+                                                <Run Text="{Binding Price}"/><Run Text=" ₽"/>
+                                            </TextBlock>
                                             <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Click="BuyButton_Click"/>
                                         </Grid>
                                     </StackPanel>
@@ -296,7 +328,15 @@
                                                         </Border>
                                                         <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                                             <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
-                                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Margin="0,4,0,0" Cursor="Hand" MouseLeftButtonUp="BookDescription_MouseLeftButtonUp"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Margin="0,4,0,0" Cursor="Hand">
+                                                                <TextBlock.ToolTip>
+                                                                    <ToolTip>
+                                                                        <Border Background="#F8FAFF" BorderBrush="#CFD8F6" BorderThickness="1" CornerRadius="12" Padding="14" Width="300">
+                                                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#344054" FontSize="14"/>
+                                                                        </Border>
+                                                                    </ToolTip>
+                                                                </TextBlock.ToolTip>
+                                                            </TextBlock>
                                                             <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,8"/>
                                                             <Grid>
                                                                 <Grid.ColumnDefinitions>

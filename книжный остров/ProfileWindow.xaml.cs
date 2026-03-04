@@ -35,22 +35,28 @@ namespace WpfAppBookStore
         }
 
 
-        private void AddressCard_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private DateTime _lastAddressClick = DateTime.MinValue;
+
+        private void AddressCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (UserSession.UserId <= 0) return;
-            try
+            if ((DateTime.Now - _lastAddressClick).TotalMilliseconds < 400)
             {
-                AddressDialog dialog = new(DatabaseService.GetUserAddress(UserSession.UserId)) { Owner = this };
-                if (dialog.ShowDialog() != true || dialog.Address == null) return;
-                DatabaseService.SaveUserAddress(UserSession.UserId, dialog.Address);
-                AddressText.Text = dialog.Address.AsSingleLine();
-                new SuccessDialog("Адрес обновлен").ShowDialog();
+                if (UserSession.UserId <= 0) return;
+                try
+                {
+                    AddressDialog dialog = new(DatabaseService.GetUserAddress(UserSession.UserId)) { Owner = this };
+                    if (dialog.ShowDialog() != true || dialog.Address == null) return;
+                    DatabaseService.SaveUserAddress(UserSession.UserId, dialog.Address);
+                    AddressText.Text = dialog.Address.AsSingleLine();
+                    new SuccessDialog("Адрес обновлен").ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    DbLogger.LogError("ProfileWindow.AddressCard_MouseLeftButtonUp", ex);
+                }
+                e.Handled = true;
             }
-            catch (Exception ex)
-            {
-                DbLogger.LogError("ProfileWindow.AddressCard_MouseDoubleClick", ex);
-            }
-            e.Handled = true;
+            _lastAddressClick = DateTime.Now;
         }
         private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
