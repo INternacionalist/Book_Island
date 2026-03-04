@@ -19,7 +19,7 @@
                     <ControlTemplate TargetType="CheckBox">
                         <Grid Width="26" Height="26">
                             <Border x:Name="SelectionBorder" Background="#F4F6FF" BorderBrush="#D0D8F5" BorderThickness="1.5" CornerRadius="13"/>
-                            <TextBlock x:Name="SelectionIcon" Text="✦" FontSize="14" FontWeight="Bold" Foreground="#A3AED0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="SelectionIcon" Text="✓" FontSize="14" FontWeight="Bold" Foreground="#A3AED0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
@@ -34,6 +34,31 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="SelectAllButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#4B6BFB"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3553D8"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="DeleteButtonStyle" TargetType="Button">
@@ -76,7 +101,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox x:Name="SelectAllCheckBox" Content="Выбрать все" FontSize="23" FontWeight="SemiBold" Foreground="#101828" VerticalAlignment="Center" Checked="SelectAllCheckBox_Click" Unchecked="SelectAllCheckBox_Click"/>
+                <Button x:Name="SelectAllButton" Content="Выбрать все" Style="{StaticResource SelectAllButtonStyle}" VerticalAlignment="Center" Click="SelectAllButton_Click"/>
                 <TextBlock Grid.Column="1" Text="🛒" FontSize="24" VerticalAlignment="Center"/>
             </Grid>
         </Border>
@@ -88,9 +113,14 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Background="#EDF1F8" CornerRadius="12" Padding="14" Margin="0,0,0,12">
-                    <TextBlock Text="Доступны для заказа" FontWeight="SemiBold" Foreground="#1D2939" FontSize="22"/>
-                </Border>
+                    <Border Background="#EDF1F8" CornerRadius="12" Padding="14" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="30" Height="30" CornerRadius="15" Background="#DDE7FF" Margin="0,0,10,0">
+                                <TextBlock Text="✓" FontWeight="Bold" Foreground="#3553D8" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="Доступны для заказа" FontWeight="SemiBold" Foreground="#1D2939" FontSize="22" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" PanningMode="VerticalOnly">
                     <ItemsControl x:Name="CartItemsControl">

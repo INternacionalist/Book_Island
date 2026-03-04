@@ -255,22 +255,29 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Style="{StaticResource BookCardStyle}" Width="200" Height="360">
+                                                <Border Style="{StaticResource BookCardStyle}">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
-                                                            <RowDefinition Height="180"/>
+                                                            <RowDefinition Height="220"/>
                                                             <RowDefinition Height="*"/>
                                                         </Grid.RowDefinitions>
                                                         <Border Grid.Row="0" Background="#EEF2FF" CornerRadius="12">
                                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                                         </Border>
                                                         <StackPanel Grid.Row="1" Margin="0,10,0,0">
-                                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="40"/>
-                                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="32" Margin="0,4,0,0"/>
-                                                            <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,6"/>
-                                                            <TextBlock Foreground="{StaticResource PrimaryDarkBrush}" FontWeight="Bold">
-                                                                <Run Text="{Binding Price}"/><Run Text=" ₽"/>
-                                                            </TextBlock>
+                                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
+                                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34" Margin="0,4,0,0"/>
+                                                            <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,8"/>
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}">
+                                                                    <Run Text="{Binding Price}"/><Run Text=" ₽"/>
+                                                                </TextBlock>
+                                                                <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Click="BuyButton_Click"/>
+                                                            </Grid>
                                                         </StackPanel>
                                                     </Grid>
                                                 </Border>
