@@ -194,9 +194,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Итог по выбранным" FontSize="18" FontWeight="SemiBold" Foreground="#1D2939" VerticalAlignment="Center"/>
-                <TextBlock x:Name="SelectedTotalText" Grid.Column="1" FontSize="28" FontWeight="Bold" Foreground="#4B6BFB" VerticalAlignment="Center"/>
+                <TextBlock x:Name="SelectedTotalText" Grid.Column="1" FontSize="28" FontWeight="Bold" Foreground="#4B6BFB" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <Button Grid.Column="2" Content="Оформить заказ" Style="{StaticResource SelectAllButtonStyle}" Width="180" Height="44" Click="PlaceOrderButton_Click"/>
             </Grid>
         </Border>
     </Grid>

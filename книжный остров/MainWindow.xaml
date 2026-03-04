@@ -184,6 +184,8 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0,0,0">
                     <Button x:Name="CartButton" Width="56" Margin="0,0,10,0" Content="🛒" Style="{StaticResource HeaderActionButtonStyle}" Click="CartButton_Click"/>
                     <Button x:Name="ProfileButton" Width="132" Content="👤 Логин" Style="{StaticResource HeaderActionButtonStyle}" Click="ProfileButton_Click"/>
+                    <Button x:Name="OrderHistoryButton" Width="120" Margin="10,0,0,0" Content="📦 История" Style="{StaticResource HeaderActionButtonStyle}" Click="OrderHistoryButton_Click" Visibility="Collapsed"/>
+                    <Button x:Name="AdminButton" Width="120" Margin="10,0,0,0" Content="🛠 Админ" Style="{StaticResource HeaderActionButtonStyle}" Click="AdminButton_Click" Visibility="Collapsed"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -193,12 +195,17 @@
                 <Border Margin="0,0,0,24" CornerRadius="20" Background="{StaticResource PrimaryBrush}" Padding="24">
                     <StackPanel>
                         <TextBlock Text="Книжный остров" Foreground="White" FontSize="34" FontWeight="Bold"/>
-                        <TextBlock Text="Подборки как в Читай-город: сначала популярные книги, ниже жанры и рекомендации." Foreground="#E8EDFF" Margin="0,6,0,0" FontSize="14"/>
+                        <TextBlock Text="Книги, жанры и обложки полностью загружаются из БД." Foreground="#E8EDFF" Margin="0,6,0,0" FontSize="14"/>
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="🔥 Популярные книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
-                <TextBlock Text="Заглушка: сюда будет добавлен код анализа БД (50% чаще добавленные в корзину + 50% чаще купленные)." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
+                <TextBlock Text="📚 Все книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
+                <TextBlock Text="Показываем 5 книг. Нажмите «Смотреть все», чтобы открыть полный каталог." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
+
+                <DockPanel Margin="0,0,0,12">
+                    <TextBlock Text="" DockPanel.Dock="Left"/>
+                    <Button Content="Смотреть все →" DockPanel.Dock="Right" Style="{StaticResource HeaderActionButtonStyle}" Width="170" Height="38" Click="OpenAllBooksButton_Click"/>
+                </DockPanel>
 
                 <ItemsControl x:Name="PopularBooksItemsControl" Margin="0,0,0,24">
                     <ItemsControl.ItemsPanel>
@@ -238,8 +245,31 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <TextBlock Text="🔥 Популярные книги" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
+                <ItemsControl x:Name="TopBooksItemsControl" Margin="0,0,0,24">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource BookCardStyle}">
+                                <Grid><Grid.RowDefinitions><RowDefinition Height="220"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                                    <Border Grid.Row="0" CornerRadius="12" Background="#EEF2FF"><Image Source="{Binding CoverImage}" Stretch="UniformToFill"/></Border>
+                                    <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" Foreground="{StaticResource TextMainBrush}"/>
+                                        <TextBlock Text="{Binding Description}" Margin="0,4,0,0" Foreground="{StaticResource TextMutedBrush}" FontSize="12" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="34"/>
+                                        <TextBlock Text="{Binding Author}" Margin="0,4,0,8" Foreground="{StaticResource TextMutedBrush}"/>
+                                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryDarkBrush}"><Run Text="{Binding Price}"/><Run Text=" ₽"/></TextBlock>
+                                            <Button Grid.Column="1" Style="{StaticResource BuyButtonStyle}" Click="BuyButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
                 <TextBlock Text="📚 Жанры" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMainBrush}" Margin="4,0,0,12"/>
-                <TextBlock Text="Заглушка: жанры и книги будут приходить из БД в следующих версиях." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
+                <TextBlock Text="Жанры формируются автоматически из данных БД." Foreground="{StaticResource TextMutedBrush}" Margin="4,0,0,14"/>
 
                 <ItemsControl x:Name="GenresItemsControl">
                     <ItemsControl.ItemTemplate>

@@ -3,6 +3,7 @@ namespace WpfAppBookStore
     public static class UserSession
     {
         public static bool IsAuthenticated { get; private set; }
+        public static bool IsAdmin { get; private set; }
         public static string UserName { get; private set; } = string.Empty;
         public static string LastName { get; private set; } = string.Empty;
         public static string PhoneNumber { get; private set; } = string.Empty;
@@ -16,6 +17,7 @@ namespace WpfAppBookStore
             PhoneNumber = phoneNumber;
             UserId = userId;
             RegistrationDateText = registrationDateText;
+            IsAdmin = userName.Trim().ToLowerInvariant() is "admin" or "administrator";
             IsAuthenticated = true;
         }
 
@@ -26,6 +28,7 @@ namespace WpfAppBookStore
             PhoneNumber = string.Empty;
             UserId = 0;
             RegistrationDateText = string.Empty;
+            IsAdmin = false;
             IsAuthenticated = false;
         }
     }

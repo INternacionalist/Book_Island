@@ -11,12 +11,13 @@ namespace WpfAppBookStore
 {
     public partial class LoginWindow : Window
     {
-        private string connStr = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
+        private string connStr = DatabaseConfig.ConnectionString;
         private static readonly HttpClient HttpClient = new();
 
         public LoginWindow()
         {
             InitializeComponent();
+            try { DatabaseService.EnsureInfrastructure(); } catch (Exception ex) { DbLogger.LogError("LoginWindow.ctor", ex); }
         }
 
         private void OpenRegistrationBtn_Click(object sender, RoutedEventArgs e)

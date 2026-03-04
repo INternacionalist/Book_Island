@@ -1,0 +1,52 @@
+<Window x:Class="WpfAppBookStore.AdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Админ-панель" Height="760" Width="980" WindowStartupLocation="CenterOwner">
+    <ScrollViewer>
+    <StackPanel Margin="12">
+        <TextBlock Text="Публикация книги" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <WrapPanel>
+            <TextBox x:Name="TitleBox" Width="220" Margin="0,0,8,8" ToolTip="Название"/>
+            <TextBox x:Name="AuthorBox" Width="180" Margin="0,0,8,8" ToolTip="Автор"/>
+            <TextBox x:Name="GenreBox" Width="140" Margin="0,0,8,8" ToolTip="Жанр"/>
+            <TextBox x:Name="PriceBox" Width="100" Margin="0,0,8,8" ToolTip="Цена"/>
+        </WrapPanel>
+        <TextBox x:Name="DescriptionBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,8" ToolTip="Описание"/>
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Выбрать обложку" Click="PickCover_Click" Margin="0,0,8,0"/>
+            <TextBlock x:Name="CoverPathText" VerticalAlignment="Center" Foreground="#667085"/>
+            <Button Content="Опубликовать" Click="Publish_Click" Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <Separator Margin="0,14,0,14"/>
+        <TextBlock Text="Удаление книги" FontSize="18" FontWeight="Bold"/>
+        <TextBox x:Name="BookSearchBox" Margin="0,8,0,8" TextChanged="BookSearchBox_TextChanged" ToolTip="Поиск книги"/>
+        <DataGrid x:Name="BooksGrid" Height="220" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding BookID}" Width="80"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*"/>
+                <DataGridTemplateColumn Header="Действие" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate><Button Content="Удалить" Tag="{Binding BookID}" Click="DeleteBook_Click"/></DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Separator Margin="0,14,0,14"/>
+        <TextBlock Text="Пользователи" FontSize="18" FontWeight="Bold"/>
+        <TextBox x:Name="UserSearchBox" Margin="0,8,0,8" TextChanged="UserSearchBox_TextChanged" ToolTip="Поиск пользователя"/>
+        <DataGrid x:Name="UsersGrid" Height="220" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="80"/>
+                <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="*"/>
+                <DataGridTemplateColumn Header="Действие" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate><Button Content="Удалить" Tag="{Binding Id}" Click="DeleteUser_Click"/></DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </StackPanel>
+    </ScrollViewer>
+</Window>
