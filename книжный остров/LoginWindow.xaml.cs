@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Globalization;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using System.Windows;
 using System.Windows.Media;
@@ -7,11 +11,27 @@ namespace WpfAppBookStore
 {
     public partial class LoginWindow : Window
     {
-        private string connStr = @"Server=144.31.48.85,1433;Database=книжный остров;User Id=sa;Password=Database33;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
+        private string connStr = DatabaseConfig.ConnectionString;
+        private static readonly HttpClient HttpClient = new();
 
         public LoginWindow()
         {
             InitializeComponent();
+            try { DatabaseService.EnsureInfrastructure(); } catch (Exception ex) { DbLogger.LogError("LoginWindow.ctor", ex); }
+        }
+
+        private void OpenRegistrationBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoginPanel.Visibility = Visibility.Collapsed;
+            RegistrationPanel.Visibility = Visibility.Visible;
+            Title = "Регистрация";
+        }
+
+        private void BackToLoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RegistrationPanel.Visibility = Visibility.Collapsed;
+            LoginPanel.Visibility = Visibility.Visible;
+            Title = "Вход в систему";
         }
 
         // === ЛОГИКА ВХОДА (LOGIN) ===
@@ -27,13 +47,29 @@ namespace WpfAppBookStore
                 return;
             }
 
+            // Спец-вход в админ-панель по заранее заданным данным.
+            if (string.Equals(login, "джефри", StringComparison.OrdinalIgnoreCase) && pass == "эпштейн")
+            {
+                new SuccessDialog("Выполнен вход администратора").ShowDialog();
+                string now = DateTime.Now.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+                UserSession.Login("джефри", "Администратор", string.Empty, -1, now, true);
+                DialogResult = true;
+                Close();
+                return;
+            }
+
             try
             {
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    
-                    string query = "SELECT * FROM читатели WHERE Login=@login AND Password=@pass";
+
+                    string registrationDateColumn = ResolveRegistrationDateColumn(conn);
+                    string registrationDateSelect = string.IsNullOrWhiteSpace(registrationDateColumn)
+                        ? "CAST(NULL AS datetime2) AS [RegistrationDate]"
+                        : $"[{registrationDateColumn}] AS [RegistrationDate]";
+
+                    string query = $"SELECT TOP 1 [id], [Login], [Фамилия], [номер телефона], {registrationDateSelect} FROM [dbo].[читатели] WHERE [Login]=@login AND [Password]=@pass";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@login", login);
@@ -41,10 +77,24 @@ namespace WpfAppBookStore
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.HasRows)
+                            if (reader.Read())
                             {
+                                int idOrdinal = reader.GetOrdinal("id");
+                                int loginOrdinal = reader.GetOrdinal("Login");
+                                int lastNameOrdinal = reader.GetOrdinal("Фамилия");
+                                int phoneOrdinal = reader.GetOrdinal("номер телефона");
+                                int regDateOrdinal = reader.GetOrdinal("RegistrationDate");
+
+                                string dbLogin = reader.IsDBNull(loginOrdinal) ? login : reader.GetString(loginOrdinal);
+                                string dbLastName = reader.IsDBNull(lastNameOrdinal) ? string.Empty : reader.GetString(lastNameOrdinal);
+                                string dbPhone = reader.IsDBNull(phoneOrdinal) ? string.Empty : reader.GetString(phoneOrdinal);
+                                int userId = reader.IsDBNull(idOrdinal) ? 0 : reader.GetInt32(idOrdinal);
+                                string dbRegDate = reader.IsDBNull(regDateOrdinal)
+                                    ? string.Empty
+                                    : reader.GetDateTime(regDateOrdinal).ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+
                                 new SuccessDialog("Вы успешно вошли!").ShowDialog();
-                                UserSession.Login(login);
+                                UserSession.Login(dbLogin, dbLastName, dbPhone, userId, dbRegDate);
                                 DialogResult = true;
                                 Close();
                             }
@@ -68,10 +118,18 @@ namespace WpfAppBookStore
         }
 
         // === ЛОГИКА РЕГИСТРАЦИИ (REGISTER) ===
-        private void RegBtn_Click(object sender, RoutedEventArgs e)
+        private async void RegBtn_Click(object sender, RoutedEventArgs e)
         {
-            string login = UserLogin.Text.Trim();
-            string pass = UserPass.Password.Trim();
+            string login = RegName.Text.Trim();
+            string lastName = RegLastName.Text.Trim();
+            string phoneNumber = RegPhone.Text.Trim();
+            string pass = RegPass.Password.Trim();
+
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phoneNumber) || string.IsNullOrWhiteSpace(pass))
+            {
+                new ErrorDialog("Заполните все поля регистрации!").ShowDialog();
+                return;
+            }
 
             if (login.Length < 3 || pass.Length < 3)
             {
@@ -81,12 +139,14 @@ namespace WpfAppBookStore
 
             try
             {
+                DateTime moscowNow = await GetMoscowDateTimeAsync();
+                string registrationDateText = moscowNow.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     conn.Open();
 
-                    // Проверяем существование
-                    string checkQuery = "SELECT COUNT(*) FROM читатели WHERE Login=@login";
+                    string checkQuery = "SELECT COUNT(*) FROM [dbo].[читатели] WHERE [Login]=@login";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@login", login);
@@ -99,17 +159,41 @@ namespace WpfAppBookStore
                         }
                     }
 
-                    // Добавляем нового пользователя
-                    string insertQuery = "INSERT INTO читатели (Login, Password) VALUES (@login, @pass)";
+                    string registrationDateColumn = ResolveRegistrationDateColumn(conn);
+                    string insertQuery;
+
+                    if (string.IsNullOrWhiteSpace(registrationDateColumn))
+                    {
+                        insertQuery = @"INSERT INTO [dbo].[читатели] ([Login], [Password], [Фамилия], [номер телефона])
+                                        VALUES (@login, @pass, @lastName, @phone);
+                                        SELECT CAST(SCOPE_IDENTITY() as int);";
+                    }
+                    else
+                    {
+                        insertQuery = $@"INSERT INTO [dbo].[читатели] ([Login], [Password], [Фамилия], [номер телефона], [{registrationDateColumn}])
+                                         VALUES (@login, @pass, @lastName, @phone, @registrationDate);
+                                         SELECT CAST(SCOPE_IDENTITY() as int);";
+                    }
+
+                    int newUserId;
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                     {
                         insertCmd.Parameters.AddWithValue("@login", login);
                         insertCmd.Parameters.AddWithValue("@pass", pass);
-                        insertCmd.ExecuteNonQuery();
+                        insertCmd.Parameters.AddWithValue("@lastName", lastName);
+                        insertCmd.Parameters.AddWithValue("@phone", phoneNumber);
+
+                        if (!string.IsNullOrWhiteSpace(registrationDateColumn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@registrationDate", moscowNow);
+                        }
+
+                        object? result = insertCmd.ExecuteScalar();
+                        newUserId = result is int id ? id : 0;
                     }
 
                     new SuccessDialog("Регистрация прошла успешно!").ShowDialog();
-                    UserSession.Login(login);
+                    UserSession.Login(login, lastName, phoneNumber, newUserId, registrationDateText);
                     DialogResult = true;
                     Close();
                 }
@@ -118,6 +202,58 @@ namespace WpfAppBookStore
             {
                 new ErrorDialog($"ОШИБКА:\n{ex.Message}").ShowDialog();
             }
+        }
+
+        private static async Task<DateTime> GetMoscowDateTimeAsync()
+        {
+            try
+            {
+                using HttpResponseMessage response = await HttpClient.GetAsync("https://worldtimeapi.org/api/timezone/Europe/Moscow");
+                response.EnsureSuccessStatusCode();
+
+                string json = await response.Content.ReadAsStringAsync();
+                using JsonDocument document = JsonDocument.Parse(json);
+
+                if (document.RootElement.TryGetProperty("datetime", out JsonElement datetimeElement)
+                    && DateTimeOffset.TryParse(datetimeElement.GetString(), out DateTimeOffset dto))
+                {
+                    return dto.LocalDateTime;
+                }
+            }
+            catch
+            {
+                // fallback ниже
+            }
+
+            try
+            {
+                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+            }
+            catch
+            {
+                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+            }
+        }
+
+        private static string ResolveRegistrationDateColumn(SqlConnection connection)
+        {
+            const string query = @"SELECT TOP 1 c.COLUMN_NAME
+                                   FROM INFORMATION_SCHEMA.COLUMNS c
+                                   WHERE c.TABLE_SCHEMA = N'dbo'
+                                     AND c.TABLE_NAME = N'читатели'
+                                     AND (c.COLUMN_NAME LIKE N'%дат%' OR c.COLUMN_NAME LIKE N'%рег%')
+                                   ORDER BY CASE
+                                              WHEN c.COLUMN_NAME = N'дата регистрации' THEN 0
+                                              WHEN c.COLUMN_NAME = N'Дата регистрации' THEN 1
+                                              WHEN c.COLUMN_NAME LIKE N'%дата%рег%' THEN 2
+                                              ELSE 3
+                                            END, c.ORDINAL_POSITION";
+
+            using SqlCommand cmd = new(query, connection);
+            object? value = cmd.ExecuteScalar();
+            return value?.ToString() ?? string.Empty;
         }
     }
 }
